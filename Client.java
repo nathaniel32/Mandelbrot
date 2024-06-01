@@ -7,7 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 
-public class Client extends UnicastRemoteObject implements ClientInterface {
+public class Client extends UnicastRemoteObject {
 
     Client(MasterInterface master) throws RemoteException {
         ApfelPresenter p = new ApfelPresenter();
@@ -15,11 +15,6 @@ public class Client extends UnicastRemoteObject implements ClientInterface {
         ApfelModel m = new ApfelModel(v, master);
         p.setModelAndView(m, v);
         p.apfelVideo();
-    }
-
-    @Override
-    public String setColor() throws RemoteException {
-        return "ok";
     }
 
     public static void main(String[] args) {
