@@ -8,7 +8,7 @@ javac Master.java
 java Master <IP>
 ```
 
-### Starten des Workers
+### 2. Starten des Workers
 
 Sie können endlose Workers starten.
 
@@ -20,7 +20,7 @@ javac Worker.java
 java Worker <Master IP> <Master Port>
 ```
 
-### Starten des Clients
+### 3. Starten des Clients
 
 ```bash
 javac Client.java
