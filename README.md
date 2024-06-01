@@ -5,7 +5,7 @@ javac Master.java
 ```
 
 ```bash
-java Master <IP>
+java Master <Master Port>
 ```
 
 ### 2. Starten des Workers
