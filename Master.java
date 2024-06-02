@@ -22,8 +22,14 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
 
     @Override
     public Color[][] bild_rechnen(int max_iter, double max_betrag, int y_sta, int y_sto, int xpix, int ypix, double xmin, double xmax, double ymin, double ymax) throws RemoteException {
-        WorkerInterface worker = worker_list.get(indexverteilung_worker);
-        indexverteilung_worker = (indexverteilung_worker + 1) % worker_list.size();
+        WorkerInterface worker;
+        synchronized (this) {
+            worker = worker_list.get(indexverteilung_worker);
+            System.out.println("Give to Worker " + indexverteilung_worker);
+
+            indexverteilung_worker = (indexverteilung_worker + 1) % worker_list.size();
+        }
+
         return worker.bild_rechnen_worker(max_iter, max_betrag, y_sta, y_sto, xpix, ypix, xmin, xmax, ymin, ymax);
     }
 
