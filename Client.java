@@ -44,8 +44,12 @@ class ApfelPresenter implements ActionListener {
     protected ApfelView v;
 
     double xmin = -1.666, xmax = 1, ymin = -1, ymax = 1; // Parameter des Ausschnitts
-    double cr = -0.743643887035151, ci = 0.131825904205330;
+    double cr, ci;
     double zoomRate = 1.5;
+    Boolean restartVideo = false;
+    Boolean isEnd = false;
+    private long startTime;
+    private long currentTime;
     //int xpix = 640, ypix = 480;
 
     public void setModelAndView(ApfelModel m, ApfelView v) {
@@ -61,10 +65,20 @@ class ApfelPresenter implements ActionListener {
         //c = m.apfel_bild(xmin, xmax, ymin, ymax);
         //v.update(c);
 
+        startTime = System.currentTimeMillis()/1000;
+        xmin = -1.666;
+        xmax = 1;
+        ymin = -1;
+        ymax = 1;
+        isEnd = false;
+
         new Thread(() -> {
             for (int i = 1; i < 65; i++) { // Iterationen bis zum Endpunkt
                 System.out.println(i + " VergrÃ¶ÃŸerung: " + 2.6 / (xmax - xmin) + " xmin: " + xmin + " xmax: " + xmax);
           
+                currentTime = System.currentTimeMillis()/1000;
+                v.update_zeit(currentTime - startTime);
+
                 Color[][] c = m.apfel_bild(xmin, xmax, ymin, ymax);
                 v.update(c);
                 double xdim = xmax - xmin;
@@ -73,6 +87,17 @@ class ApfelPresenter implements ActionListener {
                 xmax = cr + xdim / 2 / zoomRate;
                 ymin = ci - ydim / 2 / zoomRate;
                 ymax = ci + ydim / 2 / zoomRate;
+
+                if(restartVideo){
+                    break;
+                }
+            }
+
+            isEnd = true;
+
+            if(restartVideo){
+                apfelVideo();
+                restartVideo = false;
             }
         }).start();
     }
@@ -97,6 +122,7 @@ class ApfelView {
     JLabel label_ci = new JLabel("Ci Value:");
     JLabel label_cr = new JLabel("Cr Value:");
     JLabel label_threads = new JLabel("Threads:");
+    JLabel label_zeit = new JLabel();
 
     public ApfelView(ApfelPresenter p) {
         this.p = p;
@@ -107,7 +133,6 @@ class ApfelView {
         JPanel layout_home = new JPanel(new FlowLayout());
         JButton start_button_home = new JButton("Start");
 
-        
         JLabel label_xpix = new JLabel("X Pixels:");
         JLabel label_ypix = new JLabel("Y Pixels:");
 
@@ -166,11 +191,16 @@ class ApfelView {
         });
     }
 
+    public void update_zeit(long zeit){
+        label_zeit.setText("Zeit: "+ zeit +"s");
+    }
+
     private void initView() {
         JFrame frame_mandel = new JFrame();
         JPanel layout_mandel = new JPanel(new FlowLayout());
         JButton update_button_mandel = new JButton("Update");
 
+        layout_mandel.add(label_zeit);
         layout_mandel.add(label_max_iter);
         layout_mandel.add(input_max_iter);
 
@@ -194,6 +224,10 @@ class ApfelView {
 
         update_button_mandel.addActionListener(e1 -> {
             updateInputData();
+            p.restartVideo = true;
+            if(p.isEnd){
+                p.apfelVideo();
+            }
         });
 
         p.apfelVideo();
@@ -255,27 +289,35 @@ class ApfelModel {
         this.ymax = ymax;
 
         int THREAD_COUNT = v.thread;
+        int Y_LAYER = 10;
 
-        Thread[] threads = new Thread[THREAD_COUNT];
-        int rowsPerThread = ypix / THREAD_COUNT;
+        int rowsPerLayer = ypix / Y_LAYER;
 
-        for (int i = 0; i < THREAD_COUNT; i++) {
-            int y_start = i * rowsPerThread;
-            int y_end = (i == THREAD_COUNT - 1) ? ypix : y_start + rowsPerThread;
+        for (int i = 0; i < Y_LAYER; i++) {
+            int y_layer_start = i * rowsPerLayer;
+            int y_layer_end = (i == THREAD_COUNT - 1) ? ypix : y_layer_start + rowsPerLayer;
 
-            threads[i] = new Thread(new ApfelWorker(y_start, y_end));
-            threads[i].start();
+            System.out.println("Layer: " + i + ": " + y_layer_start + " bis " + y_layer_end);
 
-            //System.out.println(i);
-        }
+            Thread[] threads = new Thread[THREAD_COUNT];
+            int rowsPerThread = ypix / THREAD_COUNT;
 
-        System.out.println("Threads: " + Thread.activeCount());
+            for (int j = 0; j < THREAD_COUNT; j++) {
+                int y_start = j * rowsPerThread;
+                int y_end = (j == THREAD_COUNT - 1) ? ypix : y_start + rowsPerThread;
 
-        for (int i = 0; i < THREAD_COUNT; i++) {
-            try {
-                threads[i].join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                threads[j] = new Thread(new ApfelWorker(y_start, y_end));
+                threads[j].start();
+            }
+
+            System.out.println("Threads: " + Thread.activeCount());
+
+            for (int j = 0; j < THREAD_COUNT; j++) {
+                try {
+                    threads[j].join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
         

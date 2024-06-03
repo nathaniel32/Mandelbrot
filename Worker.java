@@ -13,22 +13,47 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
         System.out.println("In Arbeit für ypix von "+ y_sta + " bis " + y_sto);
         
         Color[][] colors = new Color[xpix][ypix];
-        double c_re, c_im;
-        for (int y = y_sta; y < y_sto; y++) {
-            c_im = ymin + (ymax - ymin) * y / ypix;
 
-            for (int x = 0; x < xpix; x++) {
-                c_re = xmin + (xmax - xmin) * x / xpix;
-                int iter = calc(max_iter, max_betrag, c_re, c_im); //return to client
-                //System.out.println(iter);
-                if (iter == max_iter) {
-                    colors[x][y] = Color.BLACK;
-                } else {
-                    float c = (float) iter / max_iter;
-                    colors[x][y] = Color.getHSBColor(c, 1f, 1f);
+        int THREAD_COUNT = 11;
+
+        Thread[] threads = new Thread[THREAD_COUNT];
+        int rowsPerThread = (y_sto-y_sta) / THREAD_COUNT;
+
+        for (int i = 0; i < THREAD_COUNT; i++) {
+            int y_start = i * rowsPerThread + y_sta;
+            int y_end = (i == THREAD_COUNT - 1) ? y_sto : y_start + rowsPerThread;
+
+            System.out.println(y_start + " bis " + y_end);
+
+            threads[i] = new Thread(() -> {
+                double c_re, c_im;
+                for (int y = y_start; y < y_end; y++) {
+                    c_im = ymin + (ymax - ymin) * y / ypix;
+    
+                    for (int x = 0; x < xpix; x++) {
+                        c_re = xmin + (xmax - xmin) * x / xpix;
+                        int iter = calc(max_iter, max_betrag, c_re, c_im);
+                        if (iter == max_iter) {
+                            colors[x][y] = Color.BLACK;
+                        } else {
+                            float c = (float) iter / max_iter;
+                            colors[x][y] = Color.getHSBColor(c, 1f, 1f);
+                        }
+                    }
                 }
+            });
+
+            threads[i].start();
+        }
+
+        for (int i = 0; i < THREAD_COUNT; i++) {
+            try {
+                threads[i].join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
+
         return colors;
     }
 
