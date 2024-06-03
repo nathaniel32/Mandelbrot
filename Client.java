@@ -300,11 +300,11 @@ class ApfelModel {
             System.out.println("Layer: " + i + ": " + y_layer_start + " bis " + y_layer_end);
 
             Thread[] threads = new Thread[THREAD_COUNT];
-            int rowsPerThread = ypix / THREAD_COUNT;
+            int rowsPerThread = (y_layer_end - y_layer_start) / THREAD_COUNT;
 
             for (int j = 0; j < THREAD_COUNT; j++) {
-                int y_start = j * rowsPerThread;
-                int y_end = (j == THREAD_COUNT - 1) ? ypix : y_start + rowsPerThread;
+                int y_start = j * rowsPerThread + y_layer_start;
+                int y_end = (j == THREAD_COUNT - 1) ? y_layer_end : y_start + rowsPerThread;
 
                 threads[j] = new Thread(new ApfelWorker(y_start, y_end));
                 threads[j].start();
