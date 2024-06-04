@@ -9,19 +9,17 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
     }
 
     @Override
-    public Color[][] bild_rechnen_worker(int max_iter, double max_betrag, int y_sta, int y_sto, int xpix, int ypix, double xmin, double xmax, double ymin, double ymax) throws RemoteException {
+    public Color[][] bild_rechnen_worker(int workers_threads, int max_iter, double max_betrag, int y_sta, int y_sto, int xpix, int ypix, double xmin, double xmax, double ymin, double ymax) throws RemoteException {
         System.out.println("In Arbeit für ypix von "+ y_sta + " bis " + y_sto);
         
         Color[][] colors = new Color[xpix][ypix];
 
-        int THREAD_COUNT = 11;
+        Thread[] threads = new Thread[workers_threads];
+        int rowsPerThread = (y_sto-y_sta) / workers_threads;
 
-        Thread[] threads = new Thread[THREAD_COUNT];
-        int rowsPerThread = (y_sto-y_sta) / THREAD_COUNT;
-
-        for (int i = 0; i < THREAD_COUNT; i++) {
+        for (int i = 0; i < workers_threads; i++) {
             int y_start = i * rowsPerThread + y_sta;
-            int y_end = (i == THREAD_COUNT - 1) ? y_sto : y_start + rowsPerThread;
+            int y_end = (i == workers_threads - 1) ? y_sto : y_start + rowsPerThread;
 
             System.out.println(y_start + " bis " + y_end);
 
@@ -46,7 +44,7 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
             threads[i].start();
         }
 
-        for (int i = 0; i < THREAD_COUNT; i++) {
+        for (int i = 0; i < workers_threads; i++) {
             try {
                 threads[i].join();
             } catch (InterruptedException e) {
