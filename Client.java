@@ -43,11 +43,13 @@ class ApfelPresenter implements ActionListener {
     protected ApfelModel m;
     protected ApfelView v;
 
+    int runden;
     double xmin = -1.666, xmax = 1, ymin = -1, ymax = 1; // Parameter des Ausschnitts
     double cr, ci;
     double zoomRate = 1.5;
     Boolean restartVideo = false;
     Boolean isEnd = false;
+    Boolean isError = false;
     private long startTime;
     private long currentTime;
     //int xpix = 640, ypix = 480;
@@ -71,10 +73,14 @@ class ApfelPresenter implements ActionListener {
         ymin = -1;
         ymax = 1;
         isEnd = false;
+        isError = false;
 
         new Thread(() -> {
-            for (int i = 1; i < 65; i++) { // Iterationen bis zum Endpunkt
-                System.out.println(i + " VergrÃ¶ÃŸerung: " + 2.6 / (xmax - xmin) + " xmin: " + xmin + " xmax: " + xmax);
+            for (int i = 1; i <= runden; i++) { // Iterationen bis zum Endpunkt
+                if(restartVideo || isError){
+                    break;
+                }
+                v.update_info(i + " Vergrößerung: " + 2.6 / (xmax - xmin) + " xmin: " + xmin + " xmax: " + xmax);
           
                 currentTime = System.currentTimeMillis()/1000;
                 v.update_zeit(currentTime - startTime);
@@ -87,10 +93,6 @@ class ApfelPresenter implements ActionListener {
                 xmax = cr + xdim / 2 / zoomRate;
                 ymin = ci - ydim / 2 / zoomRate;
                 ymax = ci + ydim / 2 / zoomRate;
-
-                if(restartVideo){
-                    break;
-                }
             }
 
             isEnd = true;
@@ -110,26 +112,29 @@ class ApfelPresenter implements ActionListener {
 
 /* ************************* View *************************** */
 class ApfelView {
-    private ApfelPresenter p;
+    ApfelPresenter p;
     private ApfelPanel ap = new ApfelPanel();
     //int xpix, ypix;
     int xpix, ypix;
-    int thread, max_iter;
+    int thread, max_iter, layer;
     BufferedImage image;
-    JTextField input_cr, input_ci, input_threads, input_max_iter;
+    JTextField input_cr, input_ci, input_threads, input_max_iter, input_layer, input_runden;
 
     JLabel label_max_iter = new JLabel("Max Iterations:");
     JLabel label_ci = new JLabel("Ci Value:");
     JLabel label_cr = new JLabel("Cr Value:");
-    JLabel label_threads = new JLabel("Threads:");
+    JLabel label_layer = new JLabel("Layer/Bild:");
+    JLabel label_threads = new JLabel("Threads/Layer:");
+    JLabel label_runden = new JLabel("Runden:");
     JLabel label_zeit = new JLabel();
+    JLabel label_info = new JLabel("Mandelbrot");
 
     public ApfelView(ApfelPresenter p) {
         this.p = p;
     }
 
     public void setDim() {
-        JFrame frame_home = new JFrame();
+        JFrame frame_home = new JFrame("Mandelbrot-Setting");
         JPanel layout_home = new JPanel(new FlowLayout());
         JButton start_button_home = new JButton("Start");
 
@@ -142,6 +147,8 @@ class ApfelView {
         input_ci = new JTextField("0.131825904205330");
         input_cr = new JTextField("-0.743643887035151");
         input_threads = new JTextField("4");
+        input_layer = new JTextField("1");
+        input_runden = new JTextField("65");
 
         /* layout_home.add(input_max_iter);
         layout_home.add(input_xpix);
@@ -150,6 +157,11 @@ class ApfelView {
         layout_home.add(input_cr);
         layout_home.add(input_threads);
         layout_home.add(start_button_home); */
+
+        layout_home.add(label_info);
+
+        layout_home.add(label_runden);
+        layout_home.add(input_runden);
 
         layout_home.add(label_max_iter);
         layout_home.add(input_max_iter);
@@ -165,6 +177,9 @@ class ApfelView {
 
         layout_home.add(label_cr);
         layout_home.add(input_cr);
+
+        layout_home.add(label_layer);
+        layout_home.add(input_layer);
 
         layout_home.add(label_threads);
         layout_home.add(input_threads);
@@ -195,12 +210,22 @@ class ApfelView {
         label_zeit.setText("Zeit: "+ zeit +"s");
     }
 
+    public void update_info(String text){
+        label_info.setText(text);
+    }
+
     private void initView() {
-        JFrame frame_mandel = new JFrame();
+        JFrame frame_mandel = new JFrame("Mandelbrot");
         JPanel layout_mandel = new JPanel(new FlowLayout());
         JButton update_button_mandel = new JButton("Update");
 
+        layout_mandel.add(label_info);
+
         layout_mandel.add(label_zeit);
+
+        layout_mandel.add(label_runden);
+        layout_mandel.add(input_runden);
+
         layout_mandel.add(label_max_iter);
         layout_mandel.add(input_max_iter);
 
@@ -209,6 +234,9 @@ class ApfelView {
 
         layout_mandel.add(label_cr);
         layout_mandel.add(input_cr);
+
+        layout_mandel.add(label_layer);
+        layout_mandel.add(input_layer);
 
         layout_mandel.add(label_threads);
         layout_mandel.add(input_threads);
@@ -234,10 +262,12 @@ class ApfelView {
     }
 
     private void updateInputData(){
+        p.runden = Integer.parseInt(input_runden.getText());
         p.cr = Double.parseDouble(input_cr.getText());
         p.ci = Double.parseDouble(input_ci.getText());
         thread = Integer.parseInt(input_threads.getText());
         max_iter = Integer.parseInt(input_max_iter.getText());
+        layer = Integer.parseInt(input_layer.getText());
     }
 
     public void update(Color[][] c) {
@@ -289,7 +319,7 @@ class ApfelModel {
         this.ymax = ymax;
 
         int THREAD_COUNT = v.thread;
-        int Y_LAYER = 10;
+        int Y_LAYER = v.layer;
 
         int rowsPerLayer = ypix / Y_LAYER;
 
@@ -317,6 +347,8 @@ class ApfelModel {
                     threads[j].join();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                    v.p.isError = true;
+                    v.update_info("Thread Error_2!");
                 }
             }
         }
@@ -345,7 +377,9 @@ class ApfelModel {
                 }
             } catch (RemoteException e) {
                 //e.printStackTrace();
-                System.out.println("Thread Error!");
+                System.out.println("error");
+                v.p.isError = true;
+                v.update_info("Thread Error!");
             }
         }
     }
