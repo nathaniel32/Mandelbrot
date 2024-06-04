@@ -123,7 +123,7 @@ class ApfelView {
     JLabel label_max_iter = new JLabel("Max Iterations:");
     JLabel label_ci = new JLabel("Ci Value:");
     JLabel label_cr = new JLabel("Cr Value:");
-    JLabel label_layer = new JLabel("Layer/Bild:");
+    JLabel label_layer = new JLabel("Layers/Bild:");
     JLabel label_threads = new JLabel("Threads/Layer:");
     JLabel label_runden = new JLabel("Runden:");
     JLabel label_zeit = new JLabel();
