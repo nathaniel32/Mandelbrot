@@ -380,7 +380,7 @@ class ApfelModel {
             getLayer();
         }
 
-        System.out.println("Threads: " + Thread.activeCount());
+        //System.out.println("Threads: " + Thread.activeCount());
 
         for (int i = 0; i < Y_LAYER; i++) {
             try {
@@ -418,7 +418,7 @@ class ApfelModel {
                 getLayer();
             } catch (RemoteException e) {
                 //e.printStackTrace();
-                System.out.println("error");
+                //System.out.println("error");
                 v.p.isError = true;
                 v.update_info("Thread Error!");
             }

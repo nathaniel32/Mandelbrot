@@ -37,10 +37,8 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
             if (worker == null) {
                 worker = worker_list.get(indexverteilung_worker);
                 worker.worker_buchen();
-                System.out.println("Worker " + indexverteilung_worker);
+                //System.out.println("Worker " + indexverteilung_worker);
                 indexverteilung_worker = (indexverteilung_worker + 1) % worker_list.size();
-            }else{
-                System.out.println("send to free worker");
             }
         }
 

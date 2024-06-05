@@ -78,7 +78,7 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
 
         currentClientIndex--;
 
-        System.out.println("Current Client: " + currentClientIndex);
+        //System.out.println("Current Client: " + currentClientIndex);
 
         return colors;
     }
