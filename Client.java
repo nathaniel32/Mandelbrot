@@ -195,11 +195,11 @@ class ApfelView {
         layout_home.add(label_ypix);
         layout_home.add(input_ypix);
 
-        layout_home.add(label_workers_threads);
-        layout_home.add(input_workers_threads);
-
         layout_home.add(label_layer);
         layout_home.add(input_layer);
+
+        layout_home.add(label_workers_threads);
+        layout_home.add(input_workers_threads);
 
         layout_home.add(input_show_layer_line);
 
@@ -258,9 +258,9 @@ class ApfelView {
                             int ceilResult = (int) Math.ceil(result);
                 
                             if (floorResult == ceilResult) {
-                                update_info("* "+floorResult + " y-pixel/worker-thread");
+                                update_info("*"+floorResult + " y-pix/worker-thread");
                             } else {
-                                update_info("* "+floorResult + "~" + ceilResult + " y-pixel/worker-thread (nicht ganz optimal)");
+                                update_info("*"+floorResult + "~" + ceilResult + " y-pix/worker-thread");
                             }
                         }else{
                             update_info("Layers sollte größer oder gleich sein als Client-Threads!");
@@ -320,11 +320,11 @@ class ApfelView {
         layout_mandel.add(label_zoom_rate);
         layout_mandel.add(input_zoom_rate);
 
-        layout_mandel.add(label_workers_threads);
-        layout_mandel.add(input_workers_threads);
-
         layout_mandel.add(label_layer);
         layout_mandel.add(input_layer);
+
+        layout_mandel.add(label_workers_threads);
+        layout_mandel.add(input_workers_threads);
 
         layout_mandel.add(input_show_layer_line);
 
