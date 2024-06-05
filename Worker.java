@@ -26,7 +26,7 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
     }
 
     @Override
-    public Color[][] bild_rechnen_worker(boolean show_layer_line, float farbe_number, int workers_threads, int max_iter, double max_betrag, int y_sta, int y_sto, int xpix, int ypix, double xmin, double xmax, double ymin, double ymax) throws RemoteException {
+    synchronized public Color[][] bild_rechnen_worker(boolean show_layer_line, float farbe_number, int workers_threads, int max_iter, double max_betrag, int y_sta, int y_sto, int xpix, int ypix, double xmin, double xmax, double ymin, double ymax) throws RemoteException {
         //System.out.println("In Arbeit für ypix von "+ y_sta + " bis " + y_sto);
         int showLayerLine = show_layer_line? 1 : 0;
         
