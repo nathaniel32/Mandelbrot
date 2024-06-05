@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 public class Client extends UnicastRemoteObject {
 
@@ -132,7 +134,7 @@ class ApfelView {
     JLabel label_workers_threads = new JLabel("Workers Threads:");
     JLabel label_runden = new JLabel("Runden:");
     JLabel label_zeit = new JLabel();
-    JLabel label_info = new JLabel("<html>Mandelbrot<br>-Layer sollte größer als der Client-Thread sein<br>-Layer sollte kleiner als die Y-Pixels geteilt durch Threads des Workers sein</html>");
+    JLabel label_info = new JLabel("Setting");
 
     public ApfelView(ApfelPresenter p) {
         this.p = p;
@@ -224,6 +226,58 @@ class ApfelView {
 
             initView();
         });
+
+        DocumentListener documentListener = new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                vorschlag();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                vorschlag();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                vorschlag();
+            }
+
+            public void vorschlag() {
+                try {
+                    int layer_value = Integer.parseInt(input_layer.getText());
+                    int workers_threads_value = Integer.parseInt(input_workers_threads.getText());
+                    int ypix_value = Integer.parseInt(input_ypix.getText());
+                    int client_threads_value = Integer.parseInt(input_client_threads.getText());
+
+                    if(layer_value != 0 && workers_threads_value != 0 && ypix_value != 0){
+                        if(client_threads_value <= layer_value){
+                            double result = (double) ypix_value / workers_threads_value / layer_value;
+        
+                            int floorResult = (int) Math.floor(result);
+                            int ceilResult = (int) Math.ceil(result);
+                
+                            if (floorResult == ceilResult) {
+                                update_info(floorResult + " pixel/worker-thread");
+                            } else {
+                                update_info(floorResult + "~" + ceilResult + " pixel/worker-thread (nicht ganz optimal)");
+                            }
+                        }else{
+                            update_info("Layers sollte größer oder gleich sein als Client-Threads!");
+                        }
+                    }else{
+                        update_info("Nummer 0 ist ungültig!");
+                    }
+                } catch (NumberFormatException e) {
+                    update_info("Y-Pixel oder Worker-Threads oder Layer sind ungültig");
+                }
+            }
+        };
+
+        input_ypix.getDocument().addDocumentListener(documentListener);
+        input_layer.getDocument().addDocumentListener(documentListener);
+        input_workers_threads.getDocument().addDocumentListener(documentListener);
+        input_client_threads.getDocument().addDocumentListener(documentListener);
     }
 
     public void update_zeit(long zeit){
