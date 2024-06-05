@@ -129,9 +129,9 @@ class ApfelView {
     JLabel label_cr = new JLabel("Cr:");
     JLabel label_zoom_rate = new JLabel("Zoom Rate:");
     JLabel label_farbe = new JLabel("Farbe:");
-    JLabel label_layer = new JLabel("Layers/Bild:");
+    JLabel label_layer = new JLabel("*Layers/Bild:");
     JLabel label_client_threads = new JLabel("Client Threads:");
-    JLabel label_workers_threads = new JLabel("Workers Threads:");
+    JLabel label_workers_threads = new JLabel("*Workers-Threads/Layer:");
     JLabel label_runden = new JLabel("Runden:");
     JLabel label_zeit = new JLabel();
     JLabel label_info = new JLabel("Setting");
@@ -146,7 +146,7 @@ class ApfelView {
         JButton start_button_home = new JButton("Start");
 
         JLabel label_xpix = new JLabel("X Pixels:");
-        JLabel label_ypix = new JLabel("Y Pixels:");
+        JLabel label_ypix = new JLabel("*Y Pixels:");
 
         input_max_iter = new JTextField("5000");
         JTextField input_xpix = new JTextField("1024");
@@ -158,7 +158,7 @@ class ApfelView {
         input_client_threads = new JTextField("4");
         input_workers_threads = new JTextField("10");
         input_layer = new JTextField("20");
-        input_show_layer_line = new JCheckBox("Client & Worker Layer Line");
+        input_show_layer_line = new JCheckBox("Worker-Thread Layer Line");
         input_runden = new JTextField("65");
 
         /* layout_home.add(input_max_iter);
@@ -180,12 +180,6 @@ class ApfelView {
         layout_home.add(label_farbe);
         layout_home.add(input_farbe);
 
-        layout_home.add(label_xpix);
-        layout_home.add(input_xpix);
-
-        layout_home.add(label_ypix);
-        layout_home.add(input_ypix);
-
         layout_home.add(label_ci);
         layout_home.add(input_ci);
 
@@ -195,6 +189,15 @@ class ApfelView {
         layout_home.add(label_zoom_rate);
         layout_home.add(input_zoom_rate);
 
+        layout_home.add(label_xpix);
+        layout_home.add(input_xpix);
+
+        layout_home.add(label_ypix);
+        layout_home.add(input_ypix);
+
+        layout_home.add(label_workers_threads);
+        layout_home.add(input_workers_threads);
+
         layout_home.add(label_layer);
         layout_home.add(input_layer);
 
@@ -202,9 +205,6 @@ class ApfelView {
 
         layout_home.add(label_client_threads);
         layout_home.add(input_client_threads);
-
-        layout_home.add(label_workers_threads);
-        layout_home.add(input_workers_threads);
         
         layout_home.add(start_button_home);
 
@@ -258,9 +258,9 @@ class ApfelView {
                             int ceilResult = (int) Math.ceil(result);
                 
                             if (floorResult == ceilResult) {
-                                update_info(floorResult + " pixel/worker-thread");
+                                update_info("* "+floorResult + " y-pixel/worker-thread");
                             } else {
-                                update_info(floorResult + "~" + ceilResult + " pixel/worker-thread (nicht ganz optimal)");
+                                update_info("* "+floorResult + "~" + ceilResult + " y-pixel/worker-thread (nicht ganz optimal)");
                             }
                         }else{
                             update_info("Layers sollte größer oder gleich sein als Client-Threads!");
@@ -320,6 +320,9 @@ class ApfelView {
         layout_mandel.add(label_zoom_rate);
         layout_mandel.add(input_zoom_rate);
 
+        layout_mandel.add(label_workers_threads);
+        layout_mandel.add(input_workers_threads);
+
         layout_mandel.add(label_layer);
         layout_mandel.add(input_layer);
 
@@ -327,9 +330,6 @@ class ApfelView {
 
         layout_mandel.add(label_client_threads);
         layout_mandel.add(input_client_threads);
-
-        layout_mandel.add(label_workers_threads);
-        layout_mandel.add(input_workers_threads);
 
         layout_mandel.add(update_button_mandel);
 
