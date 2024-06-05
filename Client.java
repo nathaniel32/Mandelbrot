@@ -238,7 +238,7 @@ class ApfelView {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice gd = ge.getDefaultScreenDevice();
         DisplayMode mode = gd.getDisplayMode();
-        int screenWidth = mode.getWidth();
+        int screenWidth = mode.getWidth() * 70/100;
         
         JFrame frame_mandel = new JFrame("Mandelbrot");
         JPanel layout_mandel = new JPanel(new FlowLayout());
