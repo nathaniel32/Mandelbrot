@@ -156,7 +156,7 @@ class ApfelView {
         input_client_threads = new JTextField("4");
         input_workers_threads = new JTextField("10");
         input_layer = new JTextField("20");
-        input_show_layer_line = new JCheckBox("client-layer & worker-layer line");
+        input_show_layer_line = new JCheckBox("Client & Worker Layer Line");
         input_runden = new JTextField("65");
 
         /* layout_home.add(input_max_iter);
