@@ -117,13 +117,15 @@ class ApfelView {
     //int xpix, ypix;
     int xpix, ypix;
     int client_threads, workers_threads, max_iter, layer;
+    float farbe_number;
     BufferedImage image;
-    JTextField input_cr, input_ci, input_zoom_rate, input_client_threads, input_max_iter, input_layer, input_runden, input_workers_threads;
+    JTextField input_farbe, input_cr, input_ci, input_zoom_rate, input_client_threads, input_max_iter, input_layer, input_runden, input_workers_threads;
 
     JLabel label_max_iter = new JLabel("Max Iterations:");
     JLabel label_ci = new JLabel("Ci:");
     JLabel label_cr = new JLabel("Cr:");
     JLabel label_zoom_rate = new JLabel("Zoom Rate:");
+    JLabel label_farbe = new JLabel("Farbe:");
     JLabel label_layer = new JLabel("Layers/Bild:");
     JLabel label_client_threads = new JLabel("Client Threads:");
     JLabel label_workers_threads = new JLabel("Workers Threads:");
@@ -144,14 +146,15 @@ class ApfelView {
         JLabel label_ypix = new JLabel("Y Pixels:");
 
         input_max_iter = new JTextField("5000");
-        JTextField input_xpix = new JTextField("640");
-        JTextField input_ypix = new JTextField("480");
-        input_ci = new JTextField("0.131825904205330");
-        input_cr = new JTextField("-0.743643887035151");
+        JTextField input_xpix = new JTextField("1024");
+        JTextField input_ypix = new JTextField("768");
+        input_farbe = new JTextField("50.5");
+        input_ci = new JTextField("-0.6065038451823017");
+        input_cr = new JTextField("-0.34837308755059104");
         input_zoom_rate = new JTextField("1.5");
         input_client_threads = new JTextField("4");
-        input_workers_threads = new JTextField("5");
-        input_layer = new JTextField("1");
+        input_workers_threads = new JTextField("10");
+        input_layer = new JTextField("8");
         input_runden = new JTextField("65");
 
         /* layout_home.add(input_max_iter);
@@ -169,6 +172,9 @@ class ApfelView {
 
         layout_home.add(label_max_iter);
         layout_home.add(input_max_iter);
+
+        layout_home.add(label_farbe);
+        layout_home.add(input_farbe);
 
         layout_home.add(label_xpix);
         layout_home.add(input_xpix);
@@ -239,6 +245,9 @@ class ApfelView {
         layout_mandel.add(label_max_iter);
         layout_mandel.add(input_max_iter);
 
+        layout_mandel.add(label_farbe);
+        layout_mandel.add(input_farbe);
+
         layout_mandel.add(label_ci);
         layout_mandel.add(input_ci);
 
@@ -262,7 +271,7 @@ class ApfelView {
         layout_mandel.setLayout(new BoxLayout(layout_mandel, BoxLayout.Y_AXIS));
         frame_mandel.add(ap, BorderLayout.CENTER);
         frame_mandel.add(layout_mandel, BorderLayout.SOUTH);
-        frame_mandel.setSize(xpix, ypix + 100);
+        frame_mandel.setSize(xpix, ypix + 400);
         frame_mandel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame_mandel.setVisible(true);
 
@@ -286,6 +295,8 @@ class ApfelView {
         max_iter = Integer.parseInt(input_max_iter.getText());
         layer = Integer.parseInt(input_layer.getText());
         workers_threads = Integer.parseInt(input_workers_threads.getText());
+        farbe_number = Float.parseFloat(input_farbe.getText());
+        System.out.println(farbe_number);
     }
 
     public void update(Color[][] c) {
@@ -389,7 +400,7 @@ class ApfelModel {
             try {
                 int max_iter = v.max_iter;
                 //bild = server.work(max_iter, max_betrag, y_sta, y_sto, xpix, ypix, xmin, xmax, ymin, ymax);
-                Color[][] result = master.bild_rechnen(v.workers_threads, max_iter, max_betrag, y_sta, y_sto, xpix, ypix, xmin, xmax, ymin, ymax);
+                Color[][] result = master.bild_rechnen(v.farbe_number, v.workers_threads, max_iter, max_betrag, y_sta, y_sto, xpix, ypix, xmin, xmax, ymin, ymax);
                 for (int y = y_sta; y < y_sto; y++) {
                     for (int x = 0; x < xpix; x++) {
                         bild[x][y] = result[x][y];
