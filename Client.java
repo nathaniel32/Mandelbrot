@@ -235,6 +235,11 @@ class ApfelView {
     }
 
     private void initView() {
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice gd = ge.getDefaultScreenDevice();
+        DisplayMode mode = gd.getDisplayMode();
+        int screenWidth = mode.getWidth();
+        
         JFrame frame_mandel = new JFrame("Mandelbrot");
         JPanel layout_mandel = new JPanel(new FlowLayout());
         JButton update_button_mandel = new JButton("Update");
@@ -275,9 +280,10 @@ class ApfelView {
         layout_mandel.add(update_button_mandel);
 
         layout_mandel.setLayout(new BoxLayout(layout_mandel, BoxLayout.Y_AXIS));
+        layout_mandel.setPreferredSize(new Dimension(screenWidth- xpix, layout_mandel.getPreferredSize().height));
         frame_mandel.add(ap, BorderLayout.CENTER);
-        frame_mandel.add(layout_mandel, BorderLayout.SOUTH);
-        frame_mandel.setSize(xpix, ypix + 400);
+        frame_mandel.add(layout_mandel, BorderLayout.WEST);
+        frame_mandel.setSize(screenWidth, ypix);
         frame_mandel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame_mandel.setVisible(true);
 
