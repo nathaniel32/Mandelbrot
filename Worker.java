@@ -4,13 +4,30 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class Worker extends UnicastRemoteObject implements WorkerInterface {
 
+    private int currentClientIndex = 0;
+
     Worker() throws RemoteException {
 
     }
 
     @Override
+    public void worker_buchen(){
+        currentClientIndex++;
+    }
+
+    @Override
+    public boolean worker_status(){
+        if(currentClientIndex == 0){
+            worker_buchen();
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    @Override
     public Color[][] bild_rechnen_worker(float farbe_number, int workers_threads, int max_iter, double max_betrag, int y_sta, int y_sto, int xpix, int ypix, double xmin, double xmax, double ymin, double ymax) throws RemoteException {
-        System.out.println("In Arbeit für ypix von "+ y_sta + " bis " + y_sto);
+        //System.out.println("In Arbeit für ypix von "+ y_sta + " bis " + y_sto);
         
         Color[][] colors = new Color[xpix][ypix];
 
@@ -21,7 +38,7 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
             int y_start = i * rowsPerThread + y_sta;
             int y_end = (i == workers_threads - 1) ? y_sto : y_start + rowsPerThread;
 
-            System.out.println(y_start + " bis " + y_end);
+            //System.out.println(y_start + " bis " + y_end);
 
             threads[i] = new Thread(() -> {
                 double c_re, c_im;
@@ -51,6 +68,10 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
                 e.printStackTrace();
             }
         }
+
+        currentClientIndex--;
+
+        System.out.println("Current Client: " + currentClientIndex);
 
         return colors;
     }

@@ -20,14 +20,28 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
         worker_list.add(worker);
     }
 
+    public WorkerInterface getFreeWorker() throws RemoteException{
+        for (WorkerInterface this_worker : worker_list) {
+            if (this_worker.worker_status()) {
+                return this_worker;
+            }
+        }
+        return null;
+    }
+
     @Override
     public Color[][] bild_rechnen(float farbe_number, int workers_threads, int max_iter, double max_betrag, int y_sta, int y_sto, int xpix, int ypix, double xmin, double xmax, double ymin, double ymax) throws RemoteException {
         WorkerInterface worker;
         synchronized (this) {
-            worker = worker_list.get(indexverteilung_worker);
-            System.out.println("Give to Worker " + indexverteilung_worker);
-
-            indexverteilung_worker = (indexverteilung_worker + 1) % worker_list.size();
+            worker = getFreeWorker();
+            if (worker == null) {
+                worker = worker_list.get(indexverteilung_worker);
+                worker.worker_buchen();
+                System.out.println("Worker " + indexverteilung_worker);
+                indexverteilung_worker = (indexverteilung_worker + 1) % worker_list.size();
+            }else{
+                System.out.println("send to free worker");
+            }
         }
 
         return worker.bild_rechnen_worker(farbe_number, workers_threads, max_iter, max_betrag, y_sta, y_sto, xpix, ypix, xmin, xmax, ymin, ymax);
