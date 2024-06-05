@@ -131,7 +131,7 @@ class ApfelView {
     JLabel label_workers_threads = new JLabel("Workers Threads:");
     JLabel label_runden = new JLabel("Runden:");
     JLabel label_zeit = new JLabel();
-    JLabel label_info = new JLabel("<html>Mandelbrot<br>-Layer sollte größer als der Client-Thread sein<br>-Layer sollte kleiner als die Y-Koordinate geteilt durch Threads des Workers sein</html>");
+    JLabel label_info = new JLabel("<html>Mandelbrot<br>-Layer sollte größer als der Client-Thread sein<br>-Layer sollte kleiner als die Y-Pixels geteilt durch Threads des Workers sein</html>");
 
     public ApfelView(ApfelPresenter p) {
         this.p = p;
