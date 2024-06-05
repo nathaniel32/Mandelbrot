@@ -30,7 +30,7 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
     }
 
     @Override
-    public Color[][] bild_rechnen(float farbe_number, int workers_threads, int max_iter, double max_betrag, int y_sta, int y_sto, int xpix, int ypix, double xmin, double xmax, double ymin, double ymax) throws RemoteException {
+    public Color[][] bild_rechnen(boolean show_layer_line, float farbe_number, int workers_threads, int max_iter, double max_betrag, int y_sta, int y_sto, int xpix, int ypix, double xmin, double xmax, double ymin, double ymax) throws RemoteException {
         WorkerInterface worker;
         synchronized (this) {
             worker = getFreeWorker();
@@ -44,7 +44,7 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
             }
         }
 
-        return worker.bild_rechnen_worker(farbe_number, workers_threads, max_iter, max_betrag, y_sta, y_sto, xpix, ypix, xmin, xmax, ymin, ymax);
+        return worker.bild_rechnen_worker(show_layer_line, farbe_number, workers_threads, max_iter, max_betrag, y_sta, y_sto, xpix, ypix, xmin, xmax, ymin, ymax);
     }
 
     public static void main(String[] args) {

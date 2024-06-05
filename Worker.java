@@ -26,22 +26,28 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
     }
 
     @Override
-    public Color[][] bild_rechnen_worker(float farbe_number, int workers_threads, int max_iter, double max_betrag, int y_sta, int y_sto, int xpix, int ypix, double xmin, double xmax, double ymin, double ymax) throws RemoteException {
+    public Color[][] bild_rechnen_worker(boolean show_layer_line, float farbe_number, int workers_threads, int max_iter, double max_betrag, int y_sta, int y_sto, int xpix, int ypix, double xmin, double xmax, double ymin, double ymax) throws RemoteException {
         //System.out.println("In Arbeit für ypix von "+ y_sta + " bis " + y_sto);
+        int showLayerLine = show_layer_line? 1 : 0;
         
-        Color[][] colors = new Color[xpix][ypix];
+        int current_y_length = y_sto - y_sta;
+
+        Color[][] colors = new Color[xpix][current_y_length];
 
         Thread[] threads = new Thread[workers_threads];
-        int rowsPerThread = (y_sto-y_sta) / workers_threads;
+        int rowsPerThread = (current_y_length) / workers_threads;
 
         for (int i = 0; i < workers_threads; i++) {
             int y_start = i * rowsPerThread + y_sta;
             int y_end = (i == workers_threads - 1) ? y_sto : y_start + rowsPerThread;
+            int current_y_start = i * rowsPerThread + showLayerLine;
 
             //System.out.println(y_start + " bis " + y_end);
 
             threads[i] = new Thread(() -> {
                 double c_re, c_im;
+                int current_y_start_index = current_y_start;
+
                 for (int y = y_start; y < y_end; y++) {
                     c_im = ymin + (ymax - ymin) * y / ypix;
     
@@ -49,12 +55,13 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
                         c_re = xmin + (xmax - xmin) * x / xpix;
                         int iter = calc(max_iter, max_betrag, c_re, c_im);
                         if (iter == max_iter) {
-                            colors[x][y] = Color.BLACK;
+                            colors[x][current_y_start_index] = Color.BLACK;
                         } else {
                             float c = (float) iter / max_iter * farbe_number;
-                            colors[x][y] = Color.getHSBColor(c, 1f, 1f);
+                            colors[x][current_y_start_index] = Color.getHSBColor(c, 1f, 1f);
                         }
                     }
+                    current_y_start_index++;
                 }
             });
 
