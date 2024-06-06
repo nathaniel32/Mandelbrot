@@ -51,7 +51,7 @@ class ApfelPresenter implements ActionListener {
     double zoomRate;
     Boolean restartVideo = false;
     Boolean isEnd = false;
-    Boolean isError = false;
+    Boolean stopVideo = false;
     private long startTime;
     private long currentTime;
     //int xpix = 640, ypix = 480;
@@ -75,11 +75,11 @@ class ApfelPresenter implements ActionListener {
         ymin = -1;
         ymax = 1;
         isEnd = false;
-        isError = false;
+        stopVideo = false;
 
         new Thread(() -> {
             for (int i = 1; i <= runden; i++) { // Iterationen bis zum Endpunkt
-                if(restartVideo || isError){
+                if(restartVideo || stopVideo){
                     break;
                 }
                 v.update_info(i + " Vergrößerung: " + 2.6 / (xmax - xmin) + " xmin: " + xmin + " xmax: " + xmax);
@@ -289,6 +289,7 @@ class ApfelView {
         JFrame frame_mandel = new JFrame("Mandelbrot");
         JPanel layout_mandel = new JPanel(new FlowLayout());
         JButton update_button_mandel = new JButton("Update");
+        JButton stop_button_mandel = new JButton("Stop");
 
         layout_mandel.add(label_info);
 
@@ -339,6 +340,10 @@ class ApfelView {
             if(p.isEnd){
                 p.apfelVideo();
             }
+        });
+
+        stop_button_mandel.addActionListener(e1 -> {
+            p.stopVideo = true;
         });
 
         p.apfelVideo();
@@ -471,7 +476,7 @@ class ApfelModel {
             } catch (RemoteException e) {
                 //e.printStackTrace();
                 //System.out.println("error");
-                v.p.isError = true;
+                v.p.stopVideo = true;
                 v.update_info("Thread Error!");
             }
         }
