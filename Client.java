@@ -250,7 +250,7 @@ class ApfelView {
                     int ypix_value = Integer.parseInt(input_ypix.getText());
                     int client_threads_value = Integer.parseInt(input_client_threads.getText());
 
-                    if(layer_value != 0 && workers_threads_value != 0 && ypix_value != 0){
+                    if(layer_value > 0 && workers_threads_value > 0 && ypix_value > 0){
                         if(client_threads_value <= layer_value){
                             double result = (double) ypix_value / workers_threads_value / layer_value;
                             update_info("*" + layer_value + "/" + layer_value + "/" + workers_threads_value + " = " + result + " y-pix/worker-thread");
@@ -258,7 +258,7 @@ class ApfelView {
                             update_info("Layers sollte größer oder gleich sein als Client-Threads!");
                         }
                     }else{
-                        update_info("Nummer 0 ist ungültig!");
+                        update_info("Nummer muss größer sein als 0!");
                     }
                 } catch (NumberFormatException e) {
                     update_info("Y-Pixel oder Worker-Threads oder Layer sind ungültig");
