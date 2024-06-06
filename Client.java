@@ -133,10 +133,12 @@ class ApfelPresenter implements ActionListener {
             v.update_info("Video-Wiedergabe");
             new Thread(() -> {
                 for (Color[][] image : imageHistory) {
-                    if(restartVideo){
-                        break;
+                    synchronized (this) {
+                        if(restartVideo){
+                            break;
+                        }
+                        v.update(image);
                     }
-                    v.update(image);
                 }
                 history_in_process = false;
             }).start();
