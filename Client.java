@@ -209,11 +209,11 @@ class ApfelView {
         input_farbe = new JTextField("50.5");
         input_ci = new JTextField("-0.6065038451823017");
         input_cr = new JTextField("-0.34837308755059104");
-        input_zoom_rate = new JTextField("1.01");
+        input_zoom_rate = new JTextField("1.1");
         input_layer = new JTextField("16");
         input_client_threads = new JTextField("4");
         input_workers_threads = new JTextField("8");
-        input_runden = new JTextField("200");
+        input_runden = new JTextField("100");
 
         /* layout_home.add(input_max_iter);
         layout_home.add(input_xpix);
