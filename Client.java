@@ -253,15 +253,7 @@ class ApfelView {
                     if(layer_value != 0 && workers_threads_value != 0 && ypix_value != 0){
                         if(client_threads_value <= layer_value){
                             double result = (double) ypix_value / workers_threads_value / layer_value;
-        
-                            int floorResult = (int) Math.floor(result);
-                            int ceilResult = (int) Math.ceil(result);
-                
-                            if (floorResult == ceilResult) {
-                                update_info("*"+floorResult + " y-pix/worker-thread");
-                            } else {
-                                update_info("*"+floorResult + "~" + ceilResult + " y-pix/worker-thread");
-                            }
+                            update_info("*" + layer_value + "/" + layer_value + "/" + workers_threads_value + " = " + result + " y-pix/worker-thread");
                         }else{
                             update_info("Layers sollte größer oder gleich sein als Client-Threads!");
                         }
