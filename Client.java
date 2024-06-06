@@ -191,7 +191,7 @@ class ApfelView {
         JLabel label_xpix = new JLabel("X Pixels:");
         JLabel label_ypix = new JLabel("*Y Pixels:");
 
-        input_max_iter = new JTextField("1000");
+        input_max_iter = new JTextField("500");
         JTextField input_xpix = new JTextField("1024");
         JTextField input_ypix = new JTextField("768");
         input_farbe = new JTextField("50.5");
@@ -201,7 +201,7 @@ class ApfelView {
         input_layer = new JTextField("16");
         input_client_threads = new JTextField("4");
         input_workers_threads = new JTextField("8");
-        input_runden = new JTextField("100");
+        input_runden = new JTextField("200");
 
         /* layout_home.add(input_max_iter);
         layout_home.add(input_xpix);
