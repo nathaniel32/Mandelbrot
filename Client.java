@@ -132,19 +132,23 @@ class ApfelPresenter implements ActionListener {
             history_in_process = true;
             v.update_info("Video-Wiedergabe");
             new Thread(() -> {
-                for (Color[][] image : imageHistory) {
-                    synchronized (this) {
-                        if(restartVideo){
-                            break;
+                try {
+                    for (Color[][] image : imageHistory) {
+                        synchronized (this) {
+                            if (restartVideo) {
+                                break;
+                            }
+                            v.update(image);
                         }
-                        v.update(image);
                     }
+                } catch (Exception e) {
+                    v.update_info("Die Videowiedergabe wird gestoppt");
+                } finally {
+                    history_in_process = false;
                 }
-                history_in_process = false;
             }).start();
         }else{
             v.update_info("Video-Wiedergabe noch im Prozess");
-            System.out.println("Video-Wiedergabe noch im Prozess");
         }
     }
 
