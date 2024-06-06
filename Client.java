@@ -155,9 +155,9 @@ class ApfelView {
         input_ci = new JTextField("-0.6065038451823017");
         input_cr = new JTextField("-0.34837308755059104");
         input_zoom_rate = new JTextField("1.5");
+        input_layer = new JTextField("16");
         input_client_threads = new JTextField("4");
-        input_workers_threads = new JTextField("10");
-        input_layer = new JTextField("20");
+        input_workers_threads = new JTextField("8");
         input_show_layer_line = new JCheckBox("Worker-Thread Layer Line");
         input_runden = new JTextField("65");
 
