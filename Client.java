@@ -1,6 +1,7 @@
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -45,15 +46,19 @@ class ApfelPresenter implements ActionListener {
     protected ApfelModel m;
     protected ApfelView v;
 
+    private ArrayList<Color[][]> imageHistory = new ArrayList<>();
+
     int runden;
     double xmin = -1.666, xmax = 1, ymin = -1, ymax = 1; // Parameter des Ausschnitts
     double cr, ci;
     double zoomRate;
-    Boolean restartVideo = false;
-    Boolean isEnd = false;
-    Boolean stopVideo = false;
+    boolean restartVideo = false;
+    boolean isEnd = false;
+    boolean stopVideo = false;
+    boolean hide_process = false;
     private long startTime;
     private long currentTime;
+    boolean history_in_process = false;
     //int xpix = 640, ypix = 480;
 
     public void setModelAndView(ApfelModel m, ApfelView v) {
@@ -69,6 +74,8 @@ class ApfelPresenter implements ActionListener {
         //c = m.apfel_bild(xmin, xmax, ymin, ymax);
         //v.update(c);
 
+        imageHistory.clear();
+
         startTime = System.currentTimeMillis()/1000;
         xmin = -1.666;
         xmax = 1;
@@ -76,19 +83,30 @@ class ApfelPresenter implements ActionListener {
         ymax = 1;
         isEnd = false;
         stopVideo = false;
+        v.replay_button_mandel.setVisible(false);
 
         new Thread(() -> {
             for (int i = 1; i <= runden; i++) { // Iterationen bis zum Endpunkt
                 if(restartVideo || stopVideo){
                     break;
                 }
-                v.update_info(i + " Vergrößerung: " + 2.6 / (xmax - xmin) + " xmin: " + xmin + " xmax: " + xmax);
+                //v.update_info(i + " Vergrößerung: " + 2.6 / (xmax - xmin) + " xmin: " + xmin + " xmax: " + xmax);
+                v.update_info("Runden: " + i);
           
                 currentTime = System.currentTimeMillis()/1000;
                 v.update_zeit(currentTime - startTime);
 
                 Color[][] c = m.apfel_bild(xmin, xmax, ymin, ymax);
-                v.update(c);
+                if(!hide_process){
+                    v.update(c);
+                }
+
+                Color[][] copyOfC = Arrays.stream(c)
+                          .map(Color[]::clone)
+                          .toArray(Color[][]::new);
+                          
+                imageHistory.add(copyOfC);
+
                 double xdim = xmax - xmin;
                 double ydim = ymax - ymin;
                 xmin = cr - xdim / 2 / zoomRate;
@@ -102,8 +120,30 @@ class ApfelPresenter implements ActionListener {
             if(restartVideo){
                 apfelVideo();
                 restartVideo = false;
+            }else{
+                v.replay_button_mandel.setVisible(true);
+                printImageHistory();
             }
         }).start();
+    }
+
+    synchronized public void printImageHistory() {
+        if(!history_in_process){
+            history_in_process = true;
+            v.update_info("Video-Wiedergabe");
+            new Thread(() -> {
+                for (Color[][] image : imageHistory) {
+                    if(restartVideo){
+                        break;
+                    }
+                    v.update(image);
+                }
+                history_in_process = false;
+            }).start();
+        }else{
+            v.update_info("Video-Wiedergabe noch im Prozess");
+            System.out.println("Video-Wiedergabe noch im Prozess");
+        }
     }
 
     @Override
@@ -123,7 +163,6 @@ class ApfelView {
     BufferedImage image;
     boolean show_layer_line;
     JTextField input_farbe, input_cr, input_ci, input_zoom_rate, input_client_threads, input_max_iter, input_layer, input_runden, input_workers_threads;
-    JCheckBox input_show_layer_line;
     JLabel label_max_iter = new JLabel("Max Iterations:");
     JLabel label_ci = new JLabel("Ci:");
     JLabel label_cr = new JLabel("Cr:");
@@ -135,6 +174,10 @@ class ApfelView {
     JLabel label_runden = new JLabel("Runden:");
     JLabel label_zeit = new JLabel();
     JLabel label_info = new JLabel("Setting");
+    JCheckBox input_show_layer_line = new JCheckBox("Worker-Thread Layer Line");
+    JCheckBox input_hide_process = new JCheckBox("Vorgang ausblenden (der Vorgang wird schneller sein)");
+
+    JButton replay_button_mandel = new JButton("Replay");
 
     public ApfelView(ApfelPresenter p) {
         this.p = p;
@@ -148,18 +191,17 @@ class ApfelView {
         JLabel label_xpix = new JLabel("X Pixels:");
         JLabel label_ypix = new JLabel("*Y Pixels:");
 
-        input_max_iter = new JTextField("5000");
+        input_max_iter = new JTextField("1000");
         JTextField input_xpix = new JTextField("1024");
         JTextField input_ypix = new JTextField("768");
         input_farbe = new JTextField("50.5");
         input_ci = new JTextField("-0.6065038451823017");
         input_cr = new JTextField("-0.34837308755059104");
-        input_zoom_rate = new JTextField("1.5");
+        input_zoom_rate = new JTextField("1.01");
         input_layer = new JTextField("16");
         input_client_threads = new JTextField("4");
         input_workers_threads = new JTextField("8");
-        input_show_layer_line = new JCheckBox("Worker-Thread Layer Line");
-        input_runden = new JTextField("65");
+        input_runden = new JTextField("100");
 
         /* layout_home.add(input_max_iter);
         layout_home.add(input_xpix);
@@ -170,6 +212,8 @@ class ApfelView {
         layout_home.add(start_button_home); */
 
         layout_home.add(label_info);
+
+        layout_home.add(input_hide_process);
 
         layout_home.add(label_runden);
         layout_home.add(input_runden);
@@ -295,6 +339,8 @@ class ApfelView {
 
         layout_mandel.add(label_zeit);
 
+        layout_mandel.add(input_hide_process);
+
         layout_mandel.add(label_runden);
         layout_mandel.add(input_runden);
 
@@ -325,6 +371,7 @@ class ApfelView {
         layout_mandel.add(input_client_threads);
 
         layout_mandel.add(update_button_mandel);
+        layout_mandel.add(replay_button_mandel);
         layout_mandel.add(stop_button_mandel);
 
         layout_mandel.setLayout(new BoxLayout(layout_mandel, BoxLayout.Y_AXIS));
@@ -341,6 +388,11 @@ class ApfelView {
             if(p.isEnd){
                 p.apfelVideo();
             }
+        });
+
+        replay_button_mandel.addActionListener(e1 -> {
+            System.out.println("ok");
+            p.printImageHistory();
         });
 
         stop_button_mandel.addActionListener(e1 -> {
@@ -361,6 +413,7 @@ class ApfelView {
         workers_threads = Integer.parseInt(input_workers_threads.getText());
         farbe_number = Float.parseFloat(input_farbe.getText());
         show_layer_line = input_show_layer_line.isSelected();
+        p.hide_process = input_hide_process.isSelected();
     }
 
     public void update(Color[][] c) {
