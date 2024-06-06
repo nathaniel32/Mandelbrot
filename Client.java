@@ -139,6 +139,12 @@ class ApfelPresenter implements ActionListener {
                                 break;
                             }
                             v.update(image);
+
+                            try {
+                                Thread.sleep(5);
+                            } catch (InterruptedException e) {
+                                v.update_info("Error: Videowiedergabe-Thread");
+                            }
                         }
                     }
                 } catch (Exception e) {
