@@ -90,8 +90,9 @@ class ApfelPresenter implements ActionListener {
                 if(restartVideo || stopVideo){
                     break;
                 }
+                v.max_iter = (int)(v.max_iter * Math.pow(zoomRate, 0.1));
                 //v.update_info(i + " Vergrößerung: " + 2.6 / (xmax - xmin) + " xmin: " + xmin + " xmax: " + xmax);
-                v.update_info("Runden: " + i);
+                v.update_info("Runden: " + i + " | Max-Iterations: " + v.max_iter);
           
                 currentTime = System.currentTimeMillis()/1000;
                 v.update_zeit(currentTime - startTime);
@@ -175,7 +176,7 @@ class ApfelView {
     BufferedImage image;
     boolean show_layer_line;
     JTextField input_farbe, input_cr, input_ci, input_zoom_rate, input_client_threads, input_max_iter, input_layer, input_runden, input_workers_threads;
-    JLabel label_max_iter = new JLabel("Max Iterations:");
+    JLabel label_max_iter = new JLabel("Start Max Iterations:");
     JLabel label_ci = new JLabel("Ci:");
     JLabel label_cr = new JLabel("Cr:");
     JLabel label_zoom_rate = new JLabel("Zoom Rate:");
