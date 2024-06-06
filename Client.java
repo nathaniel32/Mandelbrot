@@ -329,7 +329,7 @@ class ApfelView {
         layout_mandel.setPreferredSize(new Dimension(screenWidth- xpix, layout_mandel.getPreferredSize().height));
         frame_mandel.add(ap, BorderLayout.CENTER);
         frame_mandel.add(layout_mandel, BorderLayout.WEST);
-        frame_mandel.setSize(screenWidth, ypix);
+        frame_mandel.setSize(screenWidth, ypix + 40);
         frame_mandel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame_mandel.setVisible(true);
 
