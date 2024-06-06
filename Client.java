@@ -127,7 +127,7 @@ class ApfelPresenter implements ActionListener {
         }).start();
     }
 
-    synchronized public void printImageHistory() {
+    public void printImageHistory() {
         if(!history_in_process){
             history_in_process = true;
             v.update_info("Video-Wiedergabe");
