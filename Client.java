@@ -397,7 +397,6 @@ class ApfelView {
         });
 
         replay_button_mandel.addActionListener(e1 -> {
-            System.out.println("ok");
             p.printImageHistory();
         });
 
