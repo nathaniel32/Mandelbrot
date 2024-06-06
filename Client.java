@@ -325,6 +325,7 @@ class ApfelView {
         layout_mandel.add(input_client_threads);
 
         layout_mandel.add(update_button_mandel);
+        layout_mandel.add(stop_button_mandel);
 
         layout_mandel.setLayout(new BoxLayout(layout_mandel, BoxLayout.Y_AXIS));
         layout_mandel.setPreferredSize(new Dimension(screenWidth- xpix, layout_mandel.getPreferredSize().height));
