@@ -49,7 +49,7 @@ class ApfelPresenter implements ActionListener {
     private ArrayList<Color[][]> imageHistory = new ArrayList<>();
 
     int runden;
-    double xmin = -1.666, xmax = 1, ymin = -1, ymax = 1; // Parameter des Ausschnitts
+    double xmin, xmax, ymin, ymax; // Parameter des Ausschnitts
     double cr, ci;
     double zoomRate;
     boolean restartVideo = false;
@@ -172,10 +172,11 @@ class ApfelView {
     //int xpix, ypix;
     int xpix, ypix;
     int client_threads, workers_threads, max_iter, layer;
+    double max_betrag = 4.0;
     float farbe_number;
     BufferedImage image;
     boolean show_layer_line;
-    JTextField input_farbe, input_cr, input_ci, input_zoom_rate, input_client_threads, input_max_iter, input_layer, input_runden, input_workers_threads;
+    JTextField input_max_betrag, input_farbe, input_cr, input_ci, input_zoom_rate, input_client_threads, input_max_iter, input_layer, input_runden, input_workers_threads;
     JLabel label_max_iter = new JLabel("Start Max Iterations:");
     JLabel label_ci = new JLabel("Ci:");
     JLabel label_cr = new JLabel("Cr:");
@@ -187,6 +188,7 @@ class ApfelView {
     JLabel label_runden = new JLabel("Runden:");
     JLabel label_zeit = new JLabel();
     JLabel label_info = new JLabel("Setting");
+    JLabel label_max_betrag = new JLabel("Max Betrag");
     JCheckBox input_show_layer_line = new JCheckBox("Worker-Thread Layer Line");
     JCheckBox input_hide_process = new JCheckBox("Vorgang ausblenden (der Vorgang wird schneller sein)");
 
@@ -204,6 +206,8 @@ class ApfelView {
         JLabel label_xpix = new JLabel("X Pixels:");
         JLabel label_ypix = new JLabel("*Y Pixels:");
 
+        input_max_betrag = new JTextField("4.0");
+
         input_max_iter = new JTextField("500");
         JTextField input_xpix = new JTextField("1024");
         JTextField input_ypix = new JTextField("768");
@@ -214,7 +218,7 @@ class ApfelView {
         input_layer = new JTextField("16");
         input_client_threads = new JTextField("4");
         input_workers_threads = new JTextField("8");
-        input_runden = new JTextField("100");
+        input_runden = new JTextField("300");
 
         /* layout_home.add(input_max_iter);
         layout_home.add(input_xpix);
@@ -233,6 +237,9 @@ class ApfelView {
 
         layout_home.add(label_max_iter);
         layout_home.add(input_max_iter);
+
+        layout_home.add(label_max_betrag);
+        layout_home.add(input_max_betrag);
 
         layout_home.add(label_farbe);
         layout_home.add(input_farbe);
@@ -360,6 +367,9 @@ class ApfelView {
         layout_mandel.add(label_max_iter);
         layout_mandel.add(input_max_iter);
 
+        layout_mandel.add(label_max_betrag);
+        layout_mandel.add(input_max_betrag);
+
         layout_mandel.add(label_farbe);
         layout_mandel.add(input_farbe);
 
@@ -426,6 +436,7 @@ class ApfelView {
         farbe_number = Float.parseFloat(input_farbe.getText());
         show_layer_line = input_show_layer_line.isSelected();
         p.hide_process = input_hide_process.isSelected();
+        max_betrag = Double.parseDouble(input_max_betrag.getText());
     }
 
     public void update(Color[][] c) {
@@ -455,7 +466,6 @@ class ApfelModel {
     double xmin, xmax, ymin, ymax;
     Color[][] bild;
     //int max_iter = 5000;
-    double max_betrag = 4.0;
     MasterInterface master;
     int indexLayer;
     int rowsPerLayer;
@@ -531,7 +541,7 @@ class ApfelModel {
                 //bild = server.work(max_iter, max_betrag, y_sta, y_sto, xpix, ypix, xmin, xmax, ymin, ymax);
                 
                 int result_index = 0;
-                Color[][] result = master.bild_rechnen(v.show_layer_line, v.farbe_number, v.workers_threads, max_iter, max_betrag, y_sta, y_sto, xpix, ypix, xmin, xmax, ymin, ymax);
+                Color[][] result = master.bild_rechnen(v.show_layer_line, v.farbe_number, v.workers_threads, max_iter, v.max_betrag, y_sta, y_sto, xpix, ypix, xmin, xmax, ymin, ymax);
                 for (int y = y_sta; y < y_sto; y++) {
                     for (int x = 0; x < xpix; x++) {
                         bild[x][y] = result[x][result_index];
