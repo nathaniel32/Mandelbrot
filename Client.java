@@ -135,7 +135,7 @@ class ApfelPresenter implements ActionListener {
     public void printImageHistory() {
         if(!history_in_process){
             history_in_process = true;
-            v.update_info("Video-Wiedergabe");
+            v.update_info("Video-Wiedergabe || Max-Iterations: " + v.max_iter);
             new Thread(() -> {
                 try {
                     for (Color[][] image : imageHistory) {
@@ -221,9 +221,9 @@ class ApfelView {
         input_ci = new JTextField("-0.6065038451823017");
         input_cr = new JTextField("-0.34837308755059104");
         input_zoom_rate = new JTextField("1.1");
-        input_layer = new JTextField("16");
-        input_client_threads = new JTextField("4");
-        input_workers_threads = new JTextField("8");
+        input_layer = new JTextField("32");
+        input_client_threads = new JTextField("24");
+        input_workers_threads = new JTextField("24");
         input_runden = new JTextField("300");
 
         /* layout_home.add(input_max_iter);
