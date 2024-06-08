@@ -212,7 +212,7 @@ class ApfelView {
         input_max_betrag = new JTextField("4.0");
 
         input_max_iter = new JTextField("500");
-        input_add_iter = new JTextField("99999");
+        input_add_iter = new JTextField("5");
         JTextField input_xpix = new JTextField("1024");
         JTextField input_ypix = new JTextField("768");
         input_farbe = new JTextField("50.5");
