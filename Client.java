@@ -91,24 +91,10 @@ class ApfelPresenter implements ActionListener {
                     break;
                 }
 
-                v.max_iter = (int)(v.max_iter + zoomRate * v.add_iter);
-                
-                //v.update_info(i + " Vergrößerung: " + 2.6 / (xmax - xmin) + " xmin: " + xmin + " xmax: " + xmax);
-                v.update_info("Runden: " + i + " | Max-Iterations: " + v.max_iter);
-          
+                Color[][] c = m.apfel_bild(xmin, xmax, ymin, ymax);
+
                 currentTime = System.currentTimeMillis()/1000;
                 v.update_zeit(currentTime - startTime);
-
-                Color[][] c = m.apfel_bild(xmin, xmax, ymin, ymax);
-                if(!hide_process){
-                    v.update(c);
-                }
-
-                Color[][] copyOfC = Arrays.stream(c)
-                          .map(Color[]::clone)
-                          .toArray(Color[][]::new);
-                          
-                imageHistory.add(copyOfC);
 
                 double xdim = xmax - xmin;
                 double ydim = ymax - ymin;
@@ -116,6 +102,20 @@ class ApfelPresenter implements ActionListener {
                 xmax = cr + xdim / 2 / zoomRate;
                 ymin = ci - ydim / 2 / zoomRate;
                 ymax = ci + ydim / 2 / zoomRate;
+
+                if(!hide_process){
+                    v.update(c);
+                }
+
+                Color[][] copyOfC = Arrays.stream(c)
+                .map(Color[]::clone)
+                .toArray(Color[][]::new);
+                
+                imageHistory.add(copyOfC);
+
+                v.update_info("Runden: " + i + " | Max-Iterations: " + v.max_iter);
+
+                v.max_iter = (int)(v.max_iter + zoomRate * v.add_iter);
             }
 
             isEnd = true;
