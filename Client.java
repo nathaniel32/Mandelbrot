@@ -91,6 +91,8 @@ class ApfelPresenter implements ActionListener {
                     break;
                 }
 
+                v.max_iter = (int)(v.max_iter + zoomRate * v.add_iter);
+
                 Color[][] c = m.apfel_bild(xmin, xmax, ymin, ymax);
 
                 currentTime = System.currentTimeMillis()/1000;
@@ -114,8 +116,6 @@ class ApfelPresenter implements ActionListener {
                 imageHistory.add(copyOfC);
 
                 v.update_info("Runden: " + i + " | Max-Iterations: " + v.max_iter);
-
-                v.max_iter = (int)(v.max_iter + zoomRate * v.add_iter);
             }
 
             isEnd = true;
@@ -133,7 +133,7 @@ class ApfelPresenter implements ActionListener {
     public void printImageHistory() {
         if(!history_in_process){
             history_in_process = true;
-            v.update_info("Video-Wiedergabe || Max-Iterations: " + (int)(v.max_iter - zoomRate * v.add_iter));
+            v.update_info("Video-Wiedergabe || Max-Iterations: " + v.max_iter);
             new Thread(() -> {
                 try {
                     for (Color[][] image : imageHistory) {
