@@ -91,10 +91,7 @@ class ApfelPresenter implements ActionListener {
                     break;
                 }
 
-                if(v.max_iter < v.end_max_iter){
-                    //v.max_iter = (int)(v.max_iter * Math.pow(zoomRate, 0.1));
-                    v.max_iter += (int)(zoomRate * 5);
-                }
+                v.max_iter += (int)(zoomRate * v.add_iter);
                 
                 //v.update_info(i + " Vergrößerung: " + 2.6 / (xmax - xmin) + " xmin: " + xmin + " xmax: " + xmax);
                 v.update_info("Runden: " + i + " | Max-Iterations: " + v.max_iter);
@@ -176,14 +173,14 @@ class ApfelView {
     private ApfelPanel ap = new ApfelPanel();
     //int xpix, ypix;
     int xpix, ypix;
-    int client_threads, workers_threads, max_iter, end_max_iter, layer;
+    int client_threads, workers_threads, max_iter, add_iter, layer;
     double max_betrag = 4.0;
     float farbe_number;
     BufferedImage image;
     boolean show_layer_line;
-    JTextField input_end_max_iter, input_max_betrag, input_farbe, input_cr, input_ci, input_zoom_rate, input_client_threads, input_max_iter, input_layer, input_runden, input_workers_threads;
+    JTextField input_add_iter, input_max_betrag, input_farbe, input_cr, input_ci, input_zoom_rate, input_client_threads, input_max_iter, input_layer, input_runden, input_workers_threads;
     JLabel label_max_iter = new JLabel("Start Max Iterations:");
-    JLabel label_end_max_iter = new JLabel("End Max Iterations:");
+    JLabel label_add_iter = new JLabel("Add Max Iterations:");
     JLabel label_ci = new JLabel("Ci:");
     JLabel label_cr = new JLabel("Cr:");
     JLabel label_zoom_rate = new JLabel("Zoom Rate:");
@@ -215,7 +212,7 @@ class ApfelView {
         input_max_betrag = new JTextField("4.0");
 
         input_max_iter = new JTextField("500");
-        input_end_max_iter = new JTextField("99999");
+        input_add_iter = new JTextField("99999");
         JTextField input_xpix = new JTextField("1024");
         JTextField input_ypix = new JTextField("768");
         input_farbe = new JTextField("50.5");
@@ -245,8 +242,8 @@ class ApfelView {
         layout_home.add(label_max_iter);
         layout_home.add(input_max_iter);
 
-        layout_home.add(label_end_max_iter);
-        layout_home.add(input_end_max_iter);
+        layout_home.add(label_add_iter);
+        layout_home.add(input_add_iter);
 
         layout_home.add(label_max_betrag);
         layout_home.add(input_max_betrag);
@@ -377,8 +374,8 @@ class ApfelView {
         layout_mandel.add(label_max_iter);
         layout_mandel.add(input_max_iter);
 
-        layout_mandel.add(label_end_max_iter);
-        layout_mandel.add(input_end_max_iter);
+        layout_mandel.add(label_add_iter);
+        layout_mandel.add(input_add_iter);
 
         layout_mandel.add(label_max_betrag);
         layout_mandel.add(input_max_betrag);
@@ -444,7 +441,7 @@ class ApfelView {
         p.zoomRate = Double.parseDouble(input_zoom_rate.getText());
         client_threads = Integer.parseInt(input_client_threads.getText());
         max_iter = Integer.parseInt(input_max_iter.getText());
-        end_max_iter = Integer.parseInt(input_end_max_iter.getText());
+        add_iter = Integer.parseInt(input_add_iter.getText());
         layer = Integer.parseInt(input_layer.getText());
         workers_threads = Integer.parseInt(input_workers_threads.getText());
         farbe_number = Float.parseFloat(input_farbe.getText());
