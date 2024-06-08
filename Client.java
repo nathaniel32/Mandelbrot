@@ -92,7 +92,8 @@ class ApfelPresenter implements ActionListener {
                 }
 
                 if(v.max_iter < v.end_max_iter){
-                    v.max_iter = (int)(v.max_iter * Math.pow(zoomRate, 0.1));
+                    //v.max_iter = (int)(v.max_iter * Math.pow(zoomRate, 0.1));
+                    v.max_iter += (int)(zoomRate * 5);
                 }
                 
                 //v.update_info(i + " Vergrößerung: " + 2.6 / (xmax - xmin) + " xmin: " + xmin + " xmax: " + xmax);
@@ -214,7 +215,7 @@ class ApfelView {
         input_max_betrag = new JTextField("4.0");
 
         input_max_iter = new JTextField("500");
-        input_end_max_iter = new JTextField("1500");
+        input_end_max_iter = new JTextField("99999");
         JTextField input_xpix = new JTextField("1024");
         JTextField input_ypix = new JTextField("768");
         input_farbe = new JTextField("50.5");
