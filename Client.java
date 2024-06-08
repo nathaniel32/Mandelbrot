@@ -133,7 +133,7 @@ class ApfelPresenter implements ActionListener {
     public void printImageHistory() {
         if(!history_in_process){
             history_in_process = true;
-            v.update_info("Video-Wiedergabe || Max-Iterations: " + v.max_iter);
+            v.update_info("Video-Wiedergabe || Max-Iterations: " + (int)(v.max_iter - zoomRate * v.add_iter));
             new Thread(() -> {
                 try {
                     for (Color[][] image : imageHistory) {
