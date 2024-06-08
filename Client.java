@@ -91,7 +91,7 @@ class ApfelPresenter implements ActionListener {
                     break;
                 }
 
-                v.max_iter += (int)(zoomRate * v.add_iter);
+                v.max_iter = (int)(v.max_iter + zoomRate * v.add_iter);
                 
                 //v.update_info(i + " Vergrößerung: " + 2.6 / (xmax - xmin) + " xmin: " + xmin + " xmax: " + xmax);
                 v.update_info("Runden: " + i + " | Max-Iterations: " + v.max_iter);
@@ -173,8 +173,8 @@ class ApfelView {
     private ApfelPanel ap = new ApfelPanel();
     //int xpix, ypix;
     int xpix, ypix;
-    int client_threads, workers_threads, max_iter, add_iter, layer;
-    double max_betrag = 4.0;
+    int client_threads, workers_threads, max_iter, layer;
+    double max_betrag, add_iter;
     float farbe_number;
     BufferedImage image;
     boolean show_layer_line;
@@ -212,7 +212,7 @@ class ApfelView {
         input_max_betrag = new JTextField("4.0");
 
         input_max_iter = new JTextField("500");
-        input_add_iter = new JTextField("5");
+        input_add_iter = new JTextField("4.5");
         JTextField input_xpix = new JTextField("1024");
         JTextField input_ypix = new JTextField("768");
         input_farbe = new JTextField("50.5");
@@ -441,7 +441,7 @@ class ApfelView {
         p.zoomRate = Double.parseDouble(input_zoom_rate.getText());
         client_threads = Integer.parseInt(input_client_threads.getText());
         max_iter = Integer.parseInt(input_max_iter.getText());
-        add_iter = Integer.parseInt(input_add_iter.getText());
+        add_iter = Double.parseDouble(input_add_iter.getText());
         layer = Integer.parseInt(input_layer.getText());
         workers_threads = Integer.parseInt(input_workers_threads.getText());
         farbe_number = Float.parseFloat(input_farbe.getText());
