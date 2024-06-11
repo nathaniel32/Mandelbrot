@@ -1,4 +1,3 @@
-import java.awt.Color;
 import java.net.InetAddress;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
@@ -30,7 +29,7 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
     }
 
     @Override
-    public Color[][] bild_rechnen(boolean show_layer_line, float farbe_number, int workers_threads, int max_iter, double max_betrag, int y_sta, int y_sto, int xpix, int ypix, double xmin, double xmax, double ymin, double ymax) throws RemoteException {
+    public int[][] bild_rechnen(boolean show_layer_line, float farbe_number, int workers_threads, int max_iter, double max_betrag, int y_sta, int y_sto, int xpix, int ypix, double xmin, double xmax, double ymin, double ymax) throws RemoteException {
         WorkerInterface worker;
         synchronized (this) {
             worker = getFreeWorker();

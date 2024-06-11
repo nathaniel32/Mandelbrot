@@ -1,4 +1,3 @@
-import java.awt.Color;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
@@ -26,12 +25,13 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
     }
 
     @Override
-    synchronized public Color[][] bild_rechnen_worker(boolean show_layer_line, float farbe_number, int workers_threads, int max_iter, double max_betrag, int y_sta, int y_sto, int xpix, int ypix, double xmin, double xmax, double ymin, double ymax) throws RemoteException {
+    synchronized public int[][] bild_rechnen_worker(boolean show_layer_line, float farbe_number, int workers_threads, int max_iter, double max_betrag, int y_sta, int y_sto, int xpix, int ypix, double xmin, double xmax, double ymin, double ymax) throws RemoteException {
         //System.out.println("In Arbeit für ypix von "+ y_sta + " bis " + y_sto);
         
         int current_y_length = y_sto - y_sta;
 
-        Color[][] colors = new Color[xpix][current_y_length];
+        //Color[][] colors = new Color[xpix][current_y_length];
+        int[][] colors = new int[xpix][current_y_length];
 
         Thread[] threads = new Thread[workers_threads];
         int rowsPerThread = (current_y_length) / workers_threads;
@@ -53,7 +53,9 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
                     for (int x = 0; x < xpix; x++) {
                         c_re = xmin + (xmax - xmin) * x / xpix;
                         int iter = calc(max_iter, max_betrag, c_re, c_im);
-                        if (iter == max_iter) {
+                        colors[x][current_y_start_index] = iter;
+                        
+                        /* if (iter == max_iter) {
                             if(show_layer_line && y == y_end - 1){
                                 colors[x][current_y_start_index] = Color.getHSBColor(1f, 1f, 1f);
                             }else{
@@ -66,7 +68,7 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
                                 float c = (float) iter / max_iter * farbe_number;
                                 colors[x][current_y_start_index] = Color.getHSBColor(c, 1f, 1f);
                             }
-                        }
+                        } */
                     }
                     current_y_start_index++;
                 }

@@ -552,10 +552,16 @@ class ApfelModel {
                 //bild = server.work(max_iter, max_betrag, y_sta, y_sto, xpix, ypix, xmin, xmax, ymin, ymax);
                 
                 int result_index = 0;
-                Color[][] result = master.bild_rechnen(v.show_layer_line, v.farbe_number, v.workers_threads, max_iter, v.max_betrag, y_sta, y_sto, xpix, ypix, xmin, xmax, ymin, ymax);
+                int[][] result = master.bild_rechnen(v.show_layer_line, v.farbe_number, v.workers_threads, max_iter, v.max_betrag, y_sta, y_sto, xpix, ypix, xmin, xmax, ymin, ymax);
                 for (int y = y_sta; y < y_sto; y++) {
                     for (int x = 0; x < xpix; x++) {
-                        bild[x][y] = result[x][result_index];
+                        int iter = result[x][result_index];
+                        if(iter == max_iter){
+                            bild[x][y] = Color.BLACK;
+                        }else{
+                            float c = (float) iter / max_iter * v.farbe_number;
+                            bild[x][y] = Color.getHSBColor(c, 1f, 1f);
+                        }
                     }
                     result_index++;
                 }
