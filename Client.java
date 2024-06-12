@@ -62,7 +62,6 @@ class ApfelPresenter {
 
     /** Komplette Berechnung und Anzeige aller Bilder */
     void apfelVideo() {
-        startTime = System.currentTimeMillis();
         xmin = -1.666;
         xmax = 1;
         ymin = -1;
@@ -443,9 +442,6 @@ class ApfelModel {
             }else if(v.p.runden > indexRunden){
                 v.max_iter = (int)(v.max_iter + v.p.zoomRate * v.add_iter);
     
-                v.p.currentTime = System.currentTimeMillis();
-                v.update_zeit(v.p.currentTime - v.p.startTime);
-    
                 double xdim = xmax - xmin;
                 double ydim = ymax - ymin;
                 xmin = v.p.cr - xdim / 2 / v.p.zoomRate;
@@ -465,6 +461,8 @@ class ApfelModel {
             }else{
                 System.out.println("End!");
             }
+            v.p.currentTime = System.currentTimeMillis();
+            v.update_zeit(v.p.currentTime - v.p.startTime);
         }else{
             System.out.println("Forced Stop!");
             for (; indexRundenLayer < Y_LAYER * v.p.runden; indexRundenLayer++) {
@@ -490,6 +488,8 @@ class ApfelModel {
 
         threads = new Thread[Y_LAYER * v.p.runden];
         rowsPerLayer = ypix / Y_LAYER;
+
+        v.p.startTime = System.currentTimeMillis();
 
         for (int i = 0; i < THREAD_COUNT; i++) {
             getLayer();
