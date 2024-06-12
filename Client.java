@@ -457,7 +457,7 @@ class ApfelModel {
                     v.update(bild[indexRunden]);
                 }
     
-                v.update_info("Runden: " + indexRunden + " | Max-Iterations: " + v.max_iter);
+                v.update_info("Runden: " + (indexRunden + 1) + " | Max-Iterations: " + v.max_iter);
     
                 indexLayer = 0;
                 indexRunden++;
