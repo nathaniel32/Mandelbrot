@@ -453,7 +453,7 @@ class ApfelModel {
                     v.update(bild[indexRunden]);
                 }
     
-                v.update_info("Runden: " + (indexRunden + 1) + " | Max-Iterations: " + v.max_iter);
+                //v.update_info("Runden: " + (indexRunden + 1) + " | Max-Iterations: " + v.max_iter);
     
                 indexLayer = 0;
                 indexRunden++;
@@ -461,8 +461,10 @@ class ApfelModel {
             }else{
                 System.out.println("End!");
             }
+            
             v.p.currentTime = System.currentTimeMillis();
             v.update_zeit(v.p.currentTime - v.p.startTime);
+            v.update_info("Runden: " + indexRunden + " | Max-Iterations: " + v.max_iter + " | Threads: " + Thread.activeCount());
         }else{
             System.out.println("Forced Stop!");
             for (; indexRundenLayer < Y_LAYER * v.p.runden; indexRundenLayer++) {
