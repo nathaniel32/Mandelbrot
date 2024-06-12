@@ -461,16 +461,15 @@ class ApfelModel {
             }else{
                 System.out.println("End!");
             }
-            
-            v.p.currentTime = System.currentTimeMillis();
-            v.update_zeit(v.p.currentTime - v.p.startTime);
-            v.update_info("Runden: " + indexRunden + " | Max-Iterations: " + v.max_iter + " | Threads: " + Thread.activeCount());
         }else{
             System.out.println("Forced Stop!");
             for (; indexRundenLayer < Y_LAYER * v.p.runden; indexRundenLayer++) {
                 threads[indexRundenLayer] = new Thread();
             }
         }
+        v.p.currentTime = System.currentTimeMillis();
+        v.update_zeit(v.p.currentTime - v.p.startTime);
+        v.update_info("Runden: " + indexRunden + " | Max-Iterations: " + v.max_iter + " | Threads: " + Thread.activeCount());
     }
 
     /** Erzeuge ein komplettes Bild mit Threads */
