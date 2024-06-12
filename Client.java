@@ -98,7 +98,7 @@ class ApfelPresenter {
                     if(mandel_result[i][0][0] != null){
                         v.update(mandel_result[i]);
                         try {
-                            Thread.sleep(100);
+                            Thread.sleep((int) zoomRate * 150);
                         } catch (InterruptedException e) {
                             v.update_info("Error: Videowiedergabe-Thread");
                         }
@@ -427,7 +427,6 @@ class ApfelModel {
     public void setParameter(int xpix, int ypix) {
         this.xpix = xpix;
         this.ypix = ypix;
-        bild = new Color[v.p.runden][xpix][ypix];
     }
 
     synchronized public void getLayer(){
@@ -436,7 +435,7 @@ class ApfelModel {
                 int y_start = indexLayer * rowsPerLayer;
                 int y_end = (indexLayer == Y_LAYER - 1) ? ypix : y_start + rowsPerLayer;
         
-                threads[indexRundenLayer] = new Thread(new ApfelWorker(y_start, y_end, indexRunden));
+                threads[indexRundenLayer] = new Thread(new ApfelWorker(y_start, y_end, indexRunden, v.max_iter, xmin, xmax, ymin, ymax));
                 threads[indexRundenLayer].start();
         
                 indexLayer++;
@@ -481,6 +480,8 @@ class ApfelModel {
         this.ymin = ymin;
         this.ymax = ymax;
 
+        bild = new Color[v.p.runden][xpix][ypix];
+
         int THREAD_COUNT = v.client_threads;
         Y_LAYER = v.layer;
         indexLayer = 0;
@@ -506,21 +507,26 @@ class ApfelModel {
     }
 
     class ApfelWorker implements Runnable {
-        int y_sta, y_sto, this_runden;
+        int worker_y_start, worker_y_stop, worker_runden, worker_max_iter;
+        double worker_xmin, worker_xmax, worker_ymin, worker_ymax;
 
-        public ApfelWorker(int y_start, int y_stopp, int this_runden) {
-            this.y_sta = y_start;
-            this.y_sto = y_stopp;
-            this.this_runden = this_runden;
+        public ApfelWorker(int worker_y_start, int worker_y_stop, int worker_runden, int worker_max_iter, double worker_xmin, double worker_xmax, double worker_ymin, double worker_ymax) {
+            this.worker_y_start = worker_y_start;
+            this.worker_y_stop = worker_y_stop;
+            this.worker_runden = worker_runden;
+            this.worker_max_iter = worker_max_iter;
+            this.worker_xmin = worker_xmin;
+            this.worker_xmax = worker_xmax;
+            this.worker_ymin = worker_ymin;
+            this.worker_ymax = worker_ymax;
         }
 
         @Override
         public void run() {
             try {
-                int max_iter = v.max_iter;                
                 int result_index = 0;
-                int[][] result = master.bild_rechnen(v.workers_threads, max_iter, v.max_betrag, y_sta, y_sto, xpix, ypix, xmin, xmax, ymin, ymax);
-                for (int y = y_sta; y < y_sto; y++) {
+                int[][] result = master.bild_rechnen(v.workers_threads, worker_max_iter, v.max_betrag, worker_y_start, worker_y_stop, xpix, ypix, worker_xmin, worker_xmax, worker_ymin, worker_ymax);
+                for (int y = worker_y_start; y < worker_y_stop; y++) {
                     for (int x = 0; x < xpix; x++) {
                         int iter = result[x][result_index];
                         
@@ -531,18 +537,18 @@ class ApfelModel {
                             bild[this_runden][x][y] = Color.getHSBColor(c, 1f, 1f);
                         } */
 
-                        if (iter == max_iter) {
-                            if(v.show_layer_line && y == y_sto - 1){
-                                bild[this_runden][x][y] = Color.getHSBColor(1f, 1f, 1f);
+                        if (iter == worker_max_iter) {
+                            if(v.show_layer_line && y == worker_y_stop - 1){
+                                bild[worker_runden][x][y] = Color.getHSBColor(1f, 1f, 1f);
                             }else{
-                                bild[this_runden][x][y] = Color.BLACK;
+                                bild[worker_runden][x][y] = Color.BLACK;
                             }
                         } else {
-                            if(v.show_layer_line && y == y_sto - 1){
-                                bild[this_runden][x][y] = Color.BLACK;
+                            if(v.show_layer_line && y == worker_y_stop - 1){
+                                bild[worker_runden][x][y] = Color.BLACK;
                             }else{
-                                float c = (float) iter / max_iter * v.farbe_number;
-                                bild[this_runden][x][y] = Color.getHSBColor(c, 1f, 1f);
+                                float c = (float) iter / worker_max_iter * v.farbe_number;
+                                bild[worker_runden][x][y] = Color.getHSBColor(c, 1f, 1f);
                             }
                         }
                     }
