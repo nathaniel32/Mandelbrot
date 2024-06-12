@@ -139,7 +139,7 @@ class ApfelView {
     JLabel label_info = new JLabel("Setting");
     JLabel label_max_betrag = new JLabel("Max Betrag");
     JCheckBox input_show_layer_line = new JCheckBox("Layer Line");
-    JCheckBox input_hide_process = new JCheckBox("Vorgang ausblenden (der Vorgang wird schneller sein)");
+    JCheckBox input_hide_process = new JCheckBox("Vorgang ausblenden");
 
     JButton update_button_mandel = new JButton("Update");
     JButton replay_button_mandel = new JButton("Replay");

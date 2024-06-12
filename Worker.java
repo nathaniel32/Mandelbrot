@@ -26,11 +26,9 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
 
     @Override
     synchronized public int[][] bild_rechnen_worker(int workers_threads, int max_iter, double max_betrag, int y_sta, int y_sto, int xpix, int ypix, double xmin, double xmax, double ymin, double ymax) throws RemoteException {
-        //System.out.println("In Arbeit für ypix von "+ y_sta + " bis " + y_sto);
         
         int current_y_length = y_sto - y_sta;
 
-        //Color[][] colors = new Color[xpix][current_y_length];
         int[][] colors = new int[xpix][current_y_length];
 
         Thread[] threads = new Thread[workers_threads];
@@ -40,8 +38,6 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
             int y_start = i * rowsPerThread + y_sta;
             int y_end = (i == workers_threads - 1) ? y_sto : y_start + rowsPerThread;
             int current_y_start = i * rowsPerThread;
-
-            //System.out.println(y_start + " bis " + y_end);
 
             threads[i] = new Thread(() -> {
                 double c_re, c_im;
@@ -54,21 +50,6 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
                         c_re = xmin + (xmax - xmin) * x / xpix;
                         int iter = calc(max_iter, max_betrag, c_re, c_im);
                         colors[x][current_y_start_index] = iter;
-                        
-                        /* if (iter == max_iter) {
-                            if(show_layer_line && y == y_end - 1){
-                                colors[x][current_y_start_index] = Color.getHSBColor(1f, 1f, 1f);
-                            }else{
-                                colors[x][current_y_start_index] = Color.BLACK;
-                            }
-                        } else {
-                            if(show_layer_line && y == y_end - 1){
-                                colors[x][current_y_start_index] = Color.BLACK;
-                            }else{
-                                float c = (float) iter / max_iter * farbe_number;
-                                colors[x][current_y_start_index] = Color.getHSBColor(c, 1f, 1f);
-                            }
-                        } */
                     }
                     current_y_start_index++;
                 }
@@ -86,8 +67,6 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
         }
 
         currentClientIndex--;
-
-        //System.out.println("Current Client: " + currentClientIndex);
 
         return colors;
     }
