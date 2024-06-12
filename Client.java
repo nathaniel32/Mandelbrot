@@ -523,6 +523,7 @@ class ApfelModel {
                 for (int y = y_sta; y < y_sto; y++) {
                     for (int x = 0; x < xpix; x++) {
                         int iter = result[x][result_index];
+                        
                         /* if(iter == max_iter){
                             bild[this_runden][x][y] = Color.BLACK;
                         }else{
