@@ -97,7 +97,7 @@ class ApfelPresenter {
                     if(mandel_result[i][0][0] != null){
                         v.update(mandel_result[i]);
                         try {
-                            Thread.sleep((int) zoomRate * 150);
+                            Thread.sleep((int) zoomRate * 90);
                         } catch (InterruptedException e) {
                             v.update_info("Error: Videowiedergabe-Thread");
                         }
