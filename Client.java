@@ -326,10 +326,10 @@ class ApfelView {
         layout_mandel.add(label_layer);
         layout_mandel.add(input_layer);
 
+        layout_mandel.add(input_show_layer_line);
+
         layout_mandel.add(label_workers_threads);
         layout_mandel.add(input_workers_threads);
-
-        layout_mandel.add(input_show_layer_line);
 
         layout_mandel.add(label_client_threads);
         layout_mandel.add(input_client_threads);
