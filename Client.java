@@ -169,7 +169,7 @@ class ApfelView {
         input_layer = new JTextField("32");
         input_client_threads = new JTextField("24");
         input_workers_threads = new JTextField("24");
-        input_runden = new JTextField("300");
+        input_runden = new JTextField("65");
 
         layout_home.add(label_info);
 

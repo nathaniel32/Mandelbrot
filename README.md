@@ -1,4 +1,6 @@
-### 1. Starten des Masters
+# Verteiltes System: Mandelbrot
+
+## 1. Starten des Masters
 
 ```bash
 javac Master.java
@@ -8,9 +10,9 @@ javac Master.java
 java Master <Master Port>
 ```
 
-### 2. Starten des Workers
+## 2. Starten des Workers
 
-Sie können unendlich viele Workers starten.
+Es können beliebig viele Worker gestartet werden.
 
 ```bash
 javac Worker.java
@@ -20,9 +22,9 @@ javac Worker.java
 java Worker <Master IP> <Master Port>
 ```
 
-### 3. Starten des Clients
+## 3. Starten des Clients
 
-Sie können mehr als einen Client starten.
+Es können beliebig viele Clients gestartet werden.
 
 ```bash
 javac Client.java
@@ -31,3 +33,7 @@ javac Client.java
 ```bash
 java Client <Master IP> <Master Port>
 ```
+
+## Hinweise
+- Die Anzahl der Client-Threads sollte mindestens so hoch sein wie die Anzahl der gestarteten Worker.
+- Das Ergebnis des `Ypixel/workerthread` sollte in Ganzzahlen vorliegen, um eine bessere Arbeitsverteilung und zu gewährleisten.

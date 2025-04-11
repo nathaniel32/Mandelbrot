@@ -12,7 +12,8 @@ if %errorlevel% neq 0 (
 Start java Master 5000
 timeout /t 1 /nobreak  >nul
 
-rem Beispiel 3 Workers
+rem Beispiel 4 Workers
+Start java Worker localhost 5000
 Start java Worker localhost 5000
 Start java Worker localhost 5000
 Start java Worker localhost 5000
