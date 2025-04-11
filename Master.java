@@ -7,41 +7,61 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Master extends UnicastRemoteObject implements MasterInterface {
-    private List<WorkerInterface> worker_list = new ArrayList<>();
-    private int indexverteilung_worker = 0;
+    private List<WorkerManager> worker_manager_list = new ArrayList<>();
 
-    Master() throws RemoteException {
-
+    private class WorkerManager {
+        public WorkerInterface worker;
+        public int inArbeit = 0;
+    
+        public WorkerManager(WorkerInterface worker) {
+            this.worker = worker;
+        }
+    
+        public void worker_arbeit_start() {
+            inArbeit++;
+        }
+    
+        public void worker_arbeit_end() {
+            inArbeit--;
+        }
     }
+
+    private WorkerManager search_worker() throws RemoteException{
+        WorkerManager selected_worker_manager = null;
+        for (WorkerManager this_worker_manager : worker_manager_list) {
+            //System.out.println(this_worker_manager.worker + ", " + this_worker_manager.inArbeit);
+            if (this_worker_manager.inArbeit == 0) {
+                return this_worker_manager;
+            }else if (selected_worker_manager == null) {
+                selected_worker_manager = this_worker_manager;
+            }else{
+                if (this_worker_manager.inArbeit < selected_worker_manager.inArbeit) {
+                    selected_worker_manager = this_worker_manager;
+                }
+            }
+        }
+        return selected_worker_manager;
+    }
+
+    Master() throws RemoteException {}
 
     @Override
     public void worker_anmelden(WorkerInterface worker){
-        worker_list.add(worker);
-    }
-
-    public WorkerInterface getFreeWorker() throws RemoteException{
-        for (WorkerInterface this_worker : worker_list) {
-            if (this_worker.worker_status()) {
-                return this_worker;
-            }
-        }
-        return null;
+        WorkerManager worker_manager = new WorkerManager(worker);
+        worker_manager_list.add(worker_manager);
+        System.out.println("New Worker!");
     }
 
     @Override
     public int[][] bild_rechnen(int workers_threads, int max_iter, double max_betrag, int y_sta, int y_sto, int xpix, int ypix, double xmin, double xmax, double ymin, double ymax) throws RemoteException {
-        WorkerInterface worker;
+        WorkerManager worker_manager;
         synchronized (this) {
-            worker = getFreeWorker();
-            if (worker == null) {
-                worker = worker_list.get(indexverteilung_worker);
-                worker.worker_buchen();
-                //System.out.println("Worker " + indexverteilung_worker);
-                indexverteilung_worker = (indexverteilung_worker + 1) % worker_list.size();
-            }
+            worker_manager = search_worker();
+            worker_manager.worker_arbeit_start();
         }
-
-        return worker.bild_rechnen_worker(workers_threads, max_iter, max_betrag, y_sta, y_sto, xpix, ypix, xmin, xmax, ymin, ymax);
+        int[][] colors = worker_manager.worker.bild_rechnen_worker(workers_threads, max_iter, max_betrag, y_sta, y_sto, xpix, ypix, xmin, xmax, ymin, ymax);
+        worker_manager.worker_arbeit_end();
+        return colors;
     }
 
     public static void main(String[] args) {

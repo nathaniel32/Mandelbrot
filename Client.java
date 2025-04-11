@@ -224,7 +224,7 @@ class ApfelView {
         frame_home.pack();
         frame_home.setVisible(true);
 
-        start_button_home.addActionListener(e -> {
+        start_button_home.addActionListener(_ -> {
             frame_home.setVisible(false);
             
             xpix = Integer.parseInt(input_xpix.getText());
@@ -346,7 +346,7 @@ class ApfelView {
         frame_mandel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame_mandel.setVisible(true);
 
-        update_button_mandel.addActionListener(e1 -> {
+        update_button_mandel.addActionListener(_ -> {
             updateInputData();
             p.stopVideo = true;
             if(p.isEnd){
@@ -356,14 +356,14 @@ class ApfelView {
             }
         });
 
-        replay_button_mandel.addActionListener(e1 -> {
+        replay_button_mandel.addActionListener(_ -> {
             p.stopVideo = true;
             if(p.isEnd){
                 p.replay_video();
             }
         });
 
-        stop_button_mandel.addActionListener(e1 -> {
+        stop_button_mandel.addActionListener(_ -> {
             p.stopVideo = true;
         });
 

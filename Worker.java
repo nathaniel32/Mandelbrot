@@ -3,26 +3,7 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class Worker extends UnicastRemoteObject implements WorkerInterface {
 
-    private int currentClientIndex = 0;
-
-    Worker() throws RemoteException {
-
-    }
-
-    @Override
-    public void worker_buchen(){
-        currentClientIndex++;
-    }
-
-    @Override
-    public boolean worker_status(){
-        if(currentClientIndex == 0){
-            worker_buchen();
-            return true;
-        }else{
-            return false;
-        }
-    }
+    Worker() throws RemoteException {}
 
     @Override
     synchronized public int[][] bild_rechnen_worker(int workers_threads, int max_iter, double max_betrag, int y_sta, int y_sto, int xpix, int ypix, double xmin, double xmax, double ymin, double ymax) throws RemoteException {
@@ -66,12 +47,10 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
             }
         }
 
-        currentClientIndex--;
-
         return colors;
     }
 
-    public int calc(int max_iter, double max_betrag, double cr, double ci) {
+    private int calc(int max_iter, double max_betrag, double cr, double ci) {
         int iter;
         double zr = 0, zi = 0, zr2 = 0, zi2 = 0, zri = 0, betrag = 0;
         for (iter = 0; iter < max_iter && betrag <= max_betrag; iter++) {
