@@ -208,10 +208,10 @@ class ApfelView {
         layout_home.add(label_layer);
         layout_home.add(input_layer);
 
+        layout_home.add(input_show_layer_line);
+
         layout_home.add(label_workers_threads);
         layout_home.add(input_workers_threads);
-
-        layout_home.add(input_show_layer_line);
 
         layout_home.add(label_client_threads);
         layout_home.add(input_client_threads);
