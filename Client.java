@@ -159,13 +159,13 @@ class ApfelView {
         input_max_betrag = new JTextField("4.0");
 
         input_max_iter = new JTextField("500");
-        input_add_iter = new JTextField("4.5");
+        input_add_iter = new JTextField("20");
         JTextField input_xpix = new JTextField("1024");
         JTextField input_ypix = new JTextField("768");
         input_farbe = new JTextField("50.5");
         input_ci = new JTextField("-0.6065038451823017");
         input_cr = new JTextField("-0.34837308755059104");
-        input_zoom_rate = new JTextField("1.1");
+        input_zoom_rate = new JTextField("1.5");
         input_layer = new JTextField("32");
         input_client_threads = new JTextField("24");
         input_workers_threads = new JTextField("24");
