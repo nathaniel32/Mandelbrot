@@ -11,31 +11,31 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
 
     private class WorkerManager {
         public WorkerInterface worker;
-        public int inArbeit = 0;
+        public int aufgabe = 0;
     
         public WorkerManager(WorkerInterface worker) {
             this.worker = worker;
         }
     
         public void worker_arbeit_start() {
-            inArbeit++;
+            aufgabe++;
         }
     
         public void worker_arbeit_end() {
-            inArbeit--;
+            aufgabe--;
         }
     }
 
     private WorkerManager search_worker() throws RemoteException{
         WorkerManager selected_worker_manager = null;
         for (WorkerManager this_worker_manager : worker_manager_list) {
-            //System.out.println(this_worker_manager.worker + ", " + this_worker_manager.inArbeit);
-            if (this_worker_manager.inArbeit == 0) {
+            //System.out.println(this_worker_manager.worker + ", " + this_worker_manager.aufgabe);
+            if (this_worker_manager.aufgabe == 0) {
                 return this_worker_manager;
             }else if (selected_worker_manager == null) {
                 selected_worker_manager = this_worker_manager;
             }else{
-                if (this_worker_manager.inArbeit < selected_worker_manager.inArbeit) {
+                if (this_worker_manager.aufgabe < selected_worker_manager.aufgabe) {
                     selected_worker_manager = this_worker_manager;
                 }
             }
