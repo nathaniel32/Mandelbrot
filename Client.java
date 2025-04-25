@@ -5,6 +5,8 @@ import java.awt.image.BufferedImage;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import java.util.Properties;
+import java.io.FileInputStream;
 
 public class Client extends UnicastRemoteObject {
 
@@ -117,6 +119,7 @@ class ApfelPresenter {
 class ApfelView {
     ApfelPresenter p;
     private ApfelPanel ap = new ApfelPanel();
+    private Properties config_properties = new Properties();
     int xpix, ypix;
     int client_threads, workers_threads, max_iter, layer;
     double max_betrag, add_iter;
@@ -156,21 +159,39 @@ class ApfelView {
         JLabel label_xpix = new JLabel("X Pixels:");
         JLabel label_ypix = new JLabel("*Y Pixels:");
 
-        input_max_betrag = new JTextField("4.0");
+        input_max_betrag = new JTextField("0.0");
+        input_max_iter = new JTextField("0");
+        input_add_iter = new JTextField("0");
+        JTextField input_xpix = new JTextField("0");
+        JTextField input_ypix = new JTextField("0");
+        input_farbe = new JTextField("0.0");
+        input_ci = new JTextField("0.0");
+        input_cr = new JTextField("0.0");
+        input_zoom_rate = new JTextField("0.0");
+        input_layer = new JTextField("0");
+        input_client_threads = new JTextField("0");
+        input_workers_threads = new JTextField("0");
+        input_runden = new JTextField("0");
 
-        input_max_iter = new JTextField("500");
-        input_add_iter = new JTextField("20");
-        JTextField input_xpix = new JTextField("1024");
-        JTextField input_ypix = new JTextField("768");
-        input_farbe = new JTextField("50.5");
-        input_ci = new JTextField("-0.6065038451823017");
-        input_cr = new JTextField("-0.34837308755059104");
-        input_zoom_rate = new JTextField("1.5");
-        input_layer = new JTextField("32");
-        input_client_threads = new JTextField("24");
-        input_workers_threads = new JTextField("24");
-        input_runden = new JTextField("65");
-
+        try (FileInputStream config_input = new FileInputStream("client.config")) {
+            config_properties.load(config_input);
+            input_max_betrag.setText(config_properties.getProperty("input.max_betrag"));
+            input_max_iter.setText(config_properties.getProperty("input.max_iter"));
+            input_add_iter.setText(config_properties.getProperty("input.add_iter"));
+            input_xpix.setText(config_properties.getProperty("input.xpix"));
+            input_ypix.setText(config_properties.getProperty("input.ypix"));
+            input_farbe.setText(config_properties.getProperty("input.farbe"));
+            input_ci.setText(config_properties.getProperty("input.ci"));
+            input_cr.setText(config_properties.getProperty("input.cr"));
+            input_zoom_rate.setText(config_properties.getProperty("input.zoom_rate"));
+            input_layer.setText(config_properties.getProperty("input.layer"));
+            input_client_threads.setText(config_properties.getProperty("input.client_threads"));
+            input_workers_threads.setText(config_properties.getProperty("input.workers_threads"));
+            input_runden.setText(config_properties.getProperty("input.runden"));
+        } catch (Exception e) {
+            update_info("Config not found!");
+        }
+        
         layout_home.add(label_info);
 
         layout_home.add(input_hide_process);
