@@ -245,7 +245,7 @@ class ApfelView {
         frame_home.pack();
         frame_home.setVisible(true);
 
-        start_button_home.addActionListener(e1 -> {
+        start_button_home.addActionListener(e -> {
             frame_home.setVisible(false);
             
             xpix = Integer.parseInt(input_xpix.getText());
