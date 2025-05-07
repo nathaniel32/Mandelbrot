@@ -1,13 +1,13 @@
 # Verteiltes System: Mandelbrot
 
-## 1. Starten des Masters
+## 1. Starten des Clients
 
 ```bash
-javac Master.java
+javac Client.java
 ```
 
 ```bash
-java Master <Master Port>
+java Client <Client Port>
 ```
 
 ## 2. Starten des Workers
@@ -19,19 +19,7 @@ javac Worker.java
 ```
 
 ```bash
-java Worker <Master IP> <Master Port>
-```
-
-## 3. Starten des Clients
-
-Es können beliebig viele Clients gestartet werden.
-
-```bash
-javac Client.java
-```
-
-```bash
-java Client <Master IP> <Master Port>
+java Worker <Client IP> <Client Port>
 ```
 
 ## Hinweise

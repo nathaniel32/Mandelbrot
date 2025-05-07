@@ -68,22 +68,22 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
     public static void main(String[] args) {
         if (args.length == 2){
             try {
-                String masterIP = args[0];
-                int masterPort = Integer.parseInt(args[1]);
+                String clientIP = args[0];
+                int clientPort = Integer.parseInt(args[1]);
 
-                MasterInterface master = (MasterInterface) java.rmi.registry.LocateRegistry.getRegistry(masterIP, masterPort).lookup("MasterServer");
+                ClientInterface client = (ClientInterface) java.rmi.registry.LocateRegistry.getRegistry(clientIP, clientPort).lookup("ClientServer");
                 
                 Worker worker = new Worker();
 
-                master.worker_anmelden(worker);
+                client.worker_anmelden(worker);
 
-                System.out.println("Worker hat eine Verbindung zum Master-Port: " + masterPort + " hergestellt\n\n");
+                System.out.println("Worker hat eine Verbindung zum Client-Port: " + clientPort + " hergestellt\n\n");
             } catch (Exception e) {
                 System.err.println("Worker exception:");
                 e.printStackTrace();
             }
         }else{
-            System.out.println("Erforderliche Parameter: <Master IP> <Master Port>");
+            System.out.println("Erforderliche Parameter: <Client IP> <Client Port>");
         }
     }
 }
