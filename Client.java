@@ -592,13 +592,13 @@ class ApfelModel {
                         } */
 
                         if (iter == worker_max_iter) {
-                            if(v.show_layer_line && y == worker_y_stop - 1){
+                            if(v.show_layer_line && (y == worker_y_stop - 1 || x == worker_x_stop - 1)){
                                 bild[worker_runden][x][y] = Color.getHSBColor(1f, 1f, 1f);
                             }else{
                                 bild[worker_runden][x][y] = Color.BLACK;
                             }
                         } else {
-                            if(v.show_layer_line && y == worker_y_stop - 1){
+                            if(v.show_layer_line && (y == worker_y_stop - 1 || x == worker_x_stop - 1)){
                                 bild[worker_runden][x][y] = Color.BLACK;
                             }else{
                                 float c = (float) iter / worker_max_iter * v.farbe_number;
