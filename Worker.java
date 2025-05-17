@@ -6,11 +6,12 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
     Worker() throws RemoteException {}
 
     @Override
-    synchronized public int[][] bild_rechnen_worker(int workers_threads, int max_iter, double max_betrag, int y_sta, int y_sto, int xpix, int ypix, double xmin, double xmax, double ymin, double ymax) throws RemoteException {
+    synchronized public int[][] bild_rechnen_worker(int workers_threads, int max_iter, double max_betrag, int y_sta, int y_sto, int x_sta, int x_sto, int xpix, int ypix, double xmin, double xmax, double ymin, double ymax) throws RemoteException {
         
         int current_y_length = y_sto - y_sta;
+        int current_x_length = x_sto - x_sta;
 
-        int[][] colors = new int[xpix][current_y_length];
+        int[][] colors = new int[current_x_length][current_y_length];
 
         Thread[] threads = new Thread[workers_threads];
         int rowsPerThread = (current_y_length) / workers_threads;
@@ -27,8 +28,8 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
                 for (int y = y_start; y < y_end; y++) {
                     c_im = ymin + (ymax - ymin) * y / ypix;
     
-                    for (int x = 0; x < xpix; x++) {
-                        c_re = xmin + (xmax - xmin) * x / xpix;
+                    for (int x = 0; x < current_x_length; x++) {
+                        c_re = xmin + (xmax - xmin) * (x_sta + x) / xpix;
                         int iter = calc(max_iter, max_betrag, c_re, c_im);
                         colors[x][current_y_start_index] = iter;
                     }

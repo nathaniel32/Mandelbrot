@@ -53,13 +53,13 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
     }
 
     @Override
-    public int[][] bild_rechnen(int workers_threads, int max_iter, double max_betrag, int y_sta, int y_sto, int xpix, int ypix, double xmin, double xmax, double ymin, double ymax) throws RemoteException {
+    public int[][] bild_rechnen(int workers_threads, int max_iter, double max_betrag, int y_sta, int y_sto, int x_sta, int x_sto, int xpix, int ypix, double xmin, double xmax, double ymin, double ymax) throws RemoteException {
         WorkerManager worker_manager;
         synchronized (this) {
             worker_manager = search_worker();
             worker_manager.worker_arbeit_start();
         }
-        int[][] colors = worker_manager.worker.bild_rechnen_worker(workers_threads, max_iter, max_betrag, y_sta, y_sto, xpix, ypix, xmin, xmax, ymin, ymax);
+        int[][] colors = worker_manager.worker.bild_rechnen_worker(workers_threads, max_iter, max_betrag, y_sta, y_sto, x_sta, x_sto, xpix, ypix, xmin, xmax, ymin, ymax);
         worker_manager.worker_arbeit_end();
         return colors;
     }

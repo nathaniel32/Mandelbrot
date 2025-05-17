@@ -121,21 +121,22 @@ class ApfelView {
     private ApfelPanel ap = new ApfelPanel();
     private Properties config_properties = new Properties();
     int xpix, ypix;
-    int client_threads, workers_threads, max_iter, layer;
+    int client_threads, workers_threads, max_iter, yLayer, xLayer;
     double max_betrag, add_iter;
     float farbe_number;
     BufferedImage image;
     boolean show_layer_line;
-    JTextField input_add_iter, input_max_betrag, input_farbe, input_cr, input_ci, input_zoom_rate, input_client_threads, input_max_iter, input_layer, input_runden, input_workers_threads;
+    JTextField input_add_iter, input_max_betrag, input_farbe, input_cr, input_ci, input_zoom_rate, input_client_threads, input_max_iter, input_layer_y, input_layer_x, input_runden, input_workers_threads;
     JLabel label_max_iter = new JLabel("Start Max Iterations:");
     JLabel label_add_iter = new JLabel("Add Max Iterations:");
     JLabel label_ci = new JLabel("Ci:");
     JLabel label_cr = new JLabel("Cr:");
     JLabel label_zoom_rate = new JLabel("Zoom Rate:");
     JLabel label_farbe = new JLabel("Farbe:");
-    JLabel label_layer = new JLabel("*Layers/Bild:");
+    JLabel label_layer_y = new JLabel("*YLayers/Bild:");
+    JLabel label_layer_x = new JLabel("*XLayers/Bild:");
     JLabel label_client_threads = new JLabel("Client Threads:");
-    JLabel label_workers_threads = new JLabel("*Workers-Threads/Layer:");
+    JLabel label_workers_threads = new JLabel("*Workers-Threads/YLayer:");
     JLabel label_runden = new JLabel("Runden:");
     JLabel label_zeit = new JLabel();
     JLabel label_info = new JLabel("Setting");
@@ -168,7 +169,8 @@ class ApfelView {
         input_ci = new JTextField("0.0");
         input_cr = new JTextField("0.0");
         input_zoom_rate = new JTextField("0.0");
-        input_layer = new JTextField("0");
+        input_layer_y = new JTextField("0");
+        input_layer_x = new JTextField("0");
         input_client_threads = new JTextField("0");
         input_workers_threads = new JTextField("0");
         input_runden = new JTextField("0");
@@ -184,7 +186,8 @@ class ApfelView {
             input_ci.setText(config_properties.getProperty("input.ci"));
             input_cr.setText(config_properties.getProperty("input.cr"));
             input_zoom_rate.setText(config_properties.getProperty("input.zoom_rate"));
-            input_layer.setText(config_properties.getProperty("input.layer"));
+            input_layer_y.setText(config_properties.getProperty("input.layer_y"));
+            input_layer_x.setText(config_properties.getProperty("input.layer_x"));
             input_client_threads.setText(config_properties.getProperty("input.client_threads"));
             input_workers_threads.setText(config_properties.getProperty("input.workers_threads"));
             input_runden.setText(config_properties.getProperty("input.runden"));
@@ -226,8 +229,11 @@ class ApfelView {
         layout_home.add(label_ypix);
         layout_home.add(input_ypix);
 
-        layout_home.add(label_layer);
-        layout_home.add(input_layer);
+        layout_home.add(label_layer_y);
+        layout_home.add(input_layer_y);
+
+        layout_home.add(label_layer_x);
+        layout_home.add(input_layer_x);
 
         layout_home.add(input_show_layer_line);
 
@@ -276,7 +282,7 @@ class ApfelView {
 
             public void vorschlag() {
                 try {
-                    int layer_value = Integer.parseInt(input_layer.getText());
+                    int layer_value = Integer.parseInt(input_layer_y.getText());
                     int workers_threads_value = Integer.parseInt(input_workers_threads.getText());
                     int ypix_value = Integer.parseInt(input_ypix.getText());
 
@@ -293,7 +299,7 @@ class ApfelView {
         };
 
         input_ypix.getDocument().addDocumentListener(documentListener);
-        input_layer.getDocument().addDocumentListener(documentListener);
+        input_layer_y.getDocument().addDocumentListener(documentListener);
         input_workers_threads.getDocument().addDocumentListener(documentListener);
     }
 
@@ -344,8 +350,11 @@ class ApfelView {
         layout_mandel.add(label_zoom_rate);
         layout_mandel.add(input_zoom_rate);
 
-        layout_mandel.add(label_layer);
-        layout_mandel.add(input_layer);
+        layout_mandel.add(label_layer_y);
+        layout_mandel.add(input_layer_y);
+
+        layout_mandel.add(label_layer_x);
+        layout_mandel.add(input_layer_x);
 
         layout_mandel.add(input_show_layer_line);
 
@@ -399,7 +408,8 @@ class ApfelView {
         client_threads = Integer.parseInt(input_client_threads.getText());
         max_iter = Integer.parseInt(input_max_iter.getText());
         add_iter = Double.parseDouble(input_add_iter.getText());
-        layer = Integer.parseInt(input_layer.getText());
+        yLayer = Integer.parseInt(input_layer_y.getText());
+        xLayer = Integer.parseInt(input_layer_x.getText());
         workers_threads = Integer.parseInt(input_workers_threads.getText());
         farbe_number = Float.parseFloat(input_farbe.getText());
         show_layer_line = input_show_layer_line.isSelected();
@@ -434,9 +444,10 @@ class ApfelModel {
     double xmin, xmax, ymin, ymax;
     Color[][][] bild;
     MasterInterface master;
-    int indexLayer, indexRunden, indexRundenLayer;
-    int rowsPerLayer;
-    int Y_LAYER;
+    int totalThread;
+    int indexRunden, indexRundenLayer;
+    int Y_LAYER, indexLayerY, rowsPerBlock;
+    int X_LAYER, indexLayerX, columnPerBlock;
     Thread[] threads;
 
     public ApfelModel(ApfelView v, MasterInterface master) {
@@ -451,15 +462,26 @@ class ApfelModel {
 
     synchronized public void getLayer(){
         if(!v.p.stopVideo){
-            if(Y_LAYER > indexLayer && Y_LAYER * v.p.runden > indexRundenLayer){
-                int y_start = indexLayer * rowsPerLayer;
-                int y_end = (indexLayer == Y_LAYER - 1) ? ypix : y_start + rowsPerLayer;
-        
-                threads[indexRundenLayer] = new Thread(new ApfelWorker(y_start, y_end, indexRunden, v.max_iter, xmin, xmax, ymin, ymax));
-                threads[indexRundenLayer].start();
-        
-                indexLayer++;
-                indexRundenLayer++;
+            if(Y_LAYER > indexLayerY && totalThread > indexRundenLayer){
+                if(X_LAYER > indexLayerX){
+                    int y_start = indexLayerY * rowsPerBlock;
+                    int y_end = (indexLayerY == Y_LAYER - 1) ? ypix : y_start + rowsPerBlock;
+
+                    int x_start = indexLayerX * columnPerBlock;
+                    int x_end = (indexLayerX == X_LAYER - 1) ? xpix : x_start + columnPerBlock;
+
+                    //System.out.println(x_start + "- " + x_end + " | " + y_start + " - " + y_end);
+
+                    threads[indexRundenLayer] = new Thread(new ApfelWorker(y_start, y_end, x_start, x_end, indexRunden, v.max_iter, xmin, xmax, ymin, ymax));
+                    threads[indexRundenLayer].start();
+
+                    indexLayerX++;
+                    indexRundenLayer++;
+                }else{
+                    indexLayerX = 0;
+                    indexLayerY++;
+                    getLayer();
+                }
             }else if(v.p.runden > indexRunden){
                 v.max_iter = (int)(v.max_iter + v.p.zoomRate * v.add_iter);
     
@@ -476,7 +498,7 @@ class ApfelModel {
     
                 //v.update_info("Runden: " + (indexRunden + 1) + " | Max-Iterations: " + v.max_iter);
     
-                indexLayer = 0;
+                indexLayerY = 0;
                 indexRunden++;
                 getLayer();
             }else{
@@ -484,7 +506,7 @@ class ApfelModel {
             }
         }else{
             System.out.println("Forced Stop!");
-            for (; indexRundenLayer < Y_LAYER * v.p.runden; indexRundenLayer++) {
+            for (; indexRundenLayer < totalThread; indexRundenLayer++) {
                 threads[indexRundenLayer] = new Thread();
             }
         }
@@ -500,16 +522,22 @@ class ApfelModel {
         this.ymin = ymin;
         this.ymax = ymax;
 
-        bild = new Color[v.p.runden][xpix][ypix];
-
         int THREAD_COUNT = v.client_threads;
-        Y_LAYER = v.layer;
-        indexLayer = 0;
+        bild = new Color[v.p.runden][xpix][ypix];
         indexRunden = 0;
         indexRundenLayer = 0;
 
-        threads = new Thread[Y_LAYER * v.p.runden];
-        rowsPerLayer = ypix / Y_LAYER;
+        Y_LAYER = v.yLayer;
+        indexLayerY = 0;
+        rowsPerBlock = ypix / Y_LAYER;
+
+        X_LAYER = v.xLayer;
+        indexLayerX = 0;
+        columnPerBlock = xpix / X_LAYER;
+
+        totalThread = X_LAYER * Y_LAYER * v.p.runden;
+
+        threads = new Thread[totalThread];
 
         v.p.startTime = System.currentTimeMillis();
 
@@ -517,7 +545,7 @@ class ApfelModel {
             getLayer();
         }
 
-        for (int i = 0; i < Y_LAYER * v.p.runden; i++) {
+        for (int i = 0; i < totalThread; i++) {
             try {
                 threads[i].join();
             } catch (InterruptedException e) {
@@ -529,12 +557,15 @@ class ApfelModel {
     }
 
     class ApfelWorker implements Runnable {
-        int worker_y_start, worker_y_stop, worker_runden, worker_max_iter;
+        int worker_y_start, worker_y_stop, worker_x_start, worker_x_stop;
+        int worker_runden, worker_max_iter;
         double worker_xmin, worker_xmax, worker_ymin, worker_ymax;
 
-        public ApfelWorker(int worker_y_start, int worker_y_stop, int worker_runden, int worker_max_iter, double worker_xmin, double worker_xmax, double worker_ymin, double worker_ymax) {
+        public ApfelWorker(int worker_y_start, int worker_y_stop, int worker_x_start, int worker_x_stop, int worker_runden, int worker_max_iter, double worker_xmin, double worker_xmax, double worker_ymin, double worker_ymax) {
             this.worker_y_start = worker_y_start;
             this.worker_y_stop = worker_y_stop;
+            this.worker_x_start = worker_x_start;
+            this.worker_x_stop = worker_x_stop;
             this.worker_runden = worker_runden;
             this.worker_max_iter = worker_max_iter;
             this.worker_xmin = worker_xmin;
@@ -546,11 +577,12 @@ class ApfelModel {
         @Override
         public void run() {
             try {
-                int result_index = 0;
-                int[][] result = master.bild_rechnen(v.workers_threads, worker_max_iter, v.max_betrag, worker_y_start, worker_y_stop, xpix, ypix, worker_xmin, worker_xmax, worker_ymin, worker_ymax);
+                int resultY_index = 0;
+                int resultX_index = 0;
+                int[][] result = master.bild_rechnen(v.workers_threads, worker_max_iter, v.max_betrag, worker_y_start, worker_y_stop,  worker_x_start, worker_x_stop, xpix, ypix, worker_xmin, worker_xmax, worker_ymin, worker_ymax);
                 for (int y = worker_y_start; y < worker_y_stop; y++) {
-                    for (int x = 0; x < xpix; x++) {
-                        int iter = result[x][result_index];
+                    for (int x = worker_x_start; x < worker_x_stop; x++) {
+                        int iter = result[resultX_index][resultY_index];
                         
                         /* if(iter == max_iter){
                             bild[this_runden][x][y] = Color.BLACK;
@@ -573,8 +605,10 @@ class ApfelModel {
                                 bild[worker_runden][x][y] = Color.getHSBColor(c, 1f, 1f);
                             }
                         }
+                        resultX_index++;
                     }
-                    result_index++;
+                    resultX_index = 0;
+                    resultY_index++;
                 }
                 getLayer();
             } catch (RemoteException e) {
