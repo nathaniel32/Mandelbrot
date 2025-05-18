@@ -16,20 +16,23 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
         Thread[] threads = new Thread[workers_threads];
         int rowsPerThread = (current_y_length) / workers_threads;
 
+        double dx = xmax - xmin;
+        double dy = ymax - ymin;
+
         for (int i = 0; i < workers_threads; i++) {
-            int y_start = i * rowsPerThread + y_sta;
-            int y_end = (i == workers_threads - 1) ? y_sto : y_start + rowsPerThread;
             int current_y_start = i * rowsPerThread;
+            int y_start = current_y_start + y_sta;
+            int y_end = (i == workers_threads - 1) ? y_sto : y_start + rowsPerThread;
 
             threads[i] = new Thread(() -> {
                 double c_re, c_im;
                 int current_y_start_index = current_y_start;
 
                 for (int y = y_start; y < y_end; y++) {
-                    c_im = ymin + (ymax - ymin) * y / ypix;
+                    c_im = ymin + dy * y / ypix;
     
                     for (int x = 0; x < current_x_length; x++) {
-                        c_re = xmin + (xmax - xmin) * (x_sta + x) / xpix;
+                        c_re = xmin + dx * (x_sta + x) / xpix;
                         int iter = calc(max_iter, max_betrag, c_re, c_im);
                         colors[x][current_y_start_index] = iter;
                     }

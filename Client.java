@@ -42,7 +42,7 @@ public class Client extends UnicastRemoteObject {
 class ApfelPresenter {
     protected ApfelModel m;
     protected ApfelView v;
-
+    private Properties config_properties = new Properties();
     int runden;
     double xmin, xmax, ymin, ymax; // Parameter des Ausschnitts
     double cr, ci;
@@ -64,10 +64,15 @@ class ApfelPresenter {
 
     /** Komplette Berechnung und Anzeige aller Bilder */
     void apfelVideo() {
-        xmin = -1.666;
-        xmax = 1;
-        ymin = -1;
-        ymax = 1;
+        try (FileInputStream config_input = new FileInputStream("client.config")) {
+            config_properties.load(config_input);
+            xmin = Double.parseDouble(config_properties.getProperty("input.xmin"));
+            xmax = Double.parseDouble(config_properties.getProperty("input.xmax"));
+            ymin = Double.parseDouble(config_properties.getProperty("input.ymin"));
+            ymax = Double.parseDouble(config_properties.getProperty("input.ymax"));
+        } catch (Exception e) {
+            System.out.println("Config not found!");
+        }
         isEnd = false;
         stopVideo = false;
         v.replay_button_mandel.setVisible(false);
