@@ -7,6 +7,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.util.Properties;
 import java.io.FileInputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class Client extends UnicastRemoteObject {
 
@@ -42,10 +44,10 @@ public class Client extends UnicastRemoteObject {
 class ApfelPresenter {
     protected ApfelModel m;
     protected ApfelView v;
-
+    private Properties config_properties = new Properties();
     int runden;
-    double xmin, xmax, ymin, ymax; // Parameter des Ausschnitts
-    double cr, ci;
+    BigDecimal xmin, xmax, ymin, ymax; // Parameter des Ausschnitts
+    BigDecimal cr, ci;
     double zoomRate;
     boolean restartVideo = false;
     boolean isEnd = false;
@@ -64,10 +66,15 @@ class ApfelPresenter {
 
     /** Komplette Berechnung und Anzeige aller Bilder */
     void apfelVideo() {
-        xmin = -1.666;
-        xmax = 1;
-        ymin = -1;
-        ymax = 1;
+        try (FileInputStream config_input = new FileInputStream("client.config")) {
+            config_properties.load(config_input);
+            xmin = new BigDecimal(config_properties.getProperty("input.xmin"));
+            xmax = new BigDecimal(config_properties.getProperty("input.xmax"));
+            ymin = new BigDecimal(config_properties.getProperty("input.ymin"));
+            ymax = new BigDecimal(config_properties.getProperty("input.ymax"));
+        } catch (Exception e) {
+            System.out.println("Config not found!");
+        }
         isEnd = false;
         stopVideo = false;
         v.replay_button_mandel.setVisible(false);
@@ -122,7 +129,8 @@ class ApfelView {
     private Properties config_properties = new Properties();
     int xpix, ypix;
     int client_threads, workers_threads, max_iter, yLayer, xLayer;
-    double max_betrag, add_iter;
+    BigDecimal max_betrag;
+    double add_iter;
     float farbe_number;
     BufferedImage image;
     boolean show_layer_line;
@@ -402,8 +410,8 @@ class ApfelView {
 
     private void updateInputData(){
         p.runden = Integer.parseInt(input_runden.getText());
-        p.cr = Double.parseDouble(input_cr.getText());
-        p.ci = Double.parseDouble(input_ci.getText());
+        p.cr = new BigDecimal(input_cr.getText());
+        p.ci = new BigDecimal(input_ci.getText());
         p.zoomRate = Double.parseDouble(input_zoom_rate.getText());
         client_threads = Integer.parseInt(input_client_threads.getText());
         max_iter = Integer.parseInt(input_max_iter.getText());
@@ -414,7 +422,7 @@ class ApfelView {
         farbe_number = Float.parseFloat(input_farbe.getText());
         show_layer_line = input_show_layer_line.isSelected();
         p.hide_process = input_hide_process.isSelected();
-        max_betrag = Double.parseDouble(input_max_betrag.getText());
+        max_betrag =  new BigDecimal(input_max_betrag.getText());
     }
 
     public void update(Color[][] c) {
@@ -441,7 +449,7 @@ class ApfelView {
 class ApfelModel {
     ApfelView v;
     int xpix, ypix;
-    double xmin, xmax, ymin, ymax;
+    BigDecimal xmin, xmax, ymin, ymax;
     Color[][][] bild;
     MasterInterface master;
     int totalThread;
@@ -485,12 +493,26 @@ class ApfelModel {
             }else if(v.p.runden > indexRunden){
                 v.max_iter = (int)(v.max_iter + v.p.zoomRate * v.add_iter);
     
-                double xdim = xmax - xmin;
+                /* double xdim = xmax - xmin;
                 double ydim = ymax - ymin;
                 xmin = v.p.cr - xdim / 2 / v.p.zoomRate;
                 xmax = v.p.cr + xdim / 2 / v.p.zoomRate;
                 ymin = v.p.ci - ydim / 2 / v.p.zoomRate;
-                ymax = v.p.ci + ydim / 2 / v.p.zoomRate;
+                ymax = v.p.ci + ydim / 2 / v.p.zoomRate; */
+
+                BigDecimal xdim = xmax.subtract(xmin);
+                BigDecimal ydim = ymax.subtract(ymin);
+
+                BigDecimal zoomRateBD = BigDecimal.valueOf(v.p.zoomRate);
+                BigDecimal two = new BigDecimal("2");
+
+                BigDecimal xOffset = xdim.divide(two, 20, RoundingMode.HALF_UP).divide(zoomRateBD, 20, RoundingMode.HALF_UP);
+                BigDecimal yOffset = ydim.divide(two, 20, RoundingMode.HALF_UP).divide(zoomRateBD, 20, RoundingMode.HALF_UP);
+
+                xmin = v.p.cr.subtract(xOffset);
+                xmax = v.p.cr.add(xOffset);
+                ymin = v.p.ci.subtract(yOffset);
+                ymax = v.p.ci.add(yOffset);
     
                 if(!v.p.hide_process){
                     v.update(bild[indexRunden]);
@@ -516,7 +538,7 @@ class ApfelModel {
     }
 
     /** Erzeuge ein komplettes Bild mit Threads */
-    Color[][][] apfel_bild(double xmin, double xmax, double ymin, double ymax) {
+    Color[][][] apfel_bild(BigDecimal xmin, BigDecimal xmax, BigDecimal ymin, BigDecimal ymax) {
         this.xmin = xmin;
         this.xmax = xmax;
         this.ymin = ymin;
@@ -559,9 +581,9 @@ class ApfelModel {
     class ApfelWorker implements Runnable {
         int worker_y_start, worker_y_stop, worker_x_start, worker_x_stop;
         int worker_runden, worker_max_iter;
-        double worker_xmin, worker_xmax, worker_ymin, worker_ymax;
+        BigDecimal worker_xmin, worker_xmax, worker_ymin, worker_ymax;
 
-        public ApfelWorker(int worker_y_start, int worker_y_stop, int worker_x_start, int worker_x_stop, int worker_runden, int worker_max_iter, double worker_xmin, double worker_xmax, double worker_ymin, double worker_ymax) {
+        public ApfelWorker(int worker_y_start, int worker_y_stop, int worker_x_start, int worker_x_stop, int worker_runden, int worker_max_iter, BigDecimal worker_xmin, BigDecimal worker_xmax, BigDecimal worker_ymin, BigDecimal worker_ymax) {
             this.worker_y_start = worker_y_start;
             this.worker_y_stop = worker_y_stop;
             this.worker_x_start = worker_x_start;

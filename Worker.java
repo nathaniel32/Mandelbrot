@@ -1,12 +1,15 @@
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 public class Worker extends UnicastRemoteObject implements WorkerInterface {
-
+    private static final MathContext MC = new MathContext(20, RoundingMode.HALF_UP);
     Worker() throws RemoteException {}
 
     @Override
-    synchronized public int[][] bild_rechnen_worker(int workers_threads, int max_iter, double max_betrag, int y_sta, int y_sto, int x_sta, int x_sto, int xpix, int ypix, double xmin, double xmax, double ymin, double ymax) throws RemoteException {
+    synchronized public int[][] bild_rechnen_worker(int workers_threads, int max_iter, BigDecimal max_betrag, int y_sta, int y_sto, int x_sta, int x_sto, int xpix, int ypix, BigDecimal xmin, BigDecimal xmax, BigDecimal ymin, BigDecimal ymax) throws RemoteException {
         
         int current_y_length = y_sto - y_sta;
         int current_x_length = x_sto - x_sta;
@@ -16,20 +19,24 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
         Thread[] threads = new Thread[workers_threads];
         int rowsPerThread = (current_y_length) / workers_threads;
 
+        BigDecimal dx = xmax.subtract(xmin, MC).divide(BigDecimal.valueOf(xpix), MC);
+        BigDecimal dy = ymax.subtract(ymin, MC).divide(BigDecimal.valueOf(ypix), MC);
+
         for (int i = 0; i < workers_threads; i++) {
             int y_start = i * rowsPerThread + y_sta;
             int y_end = (i == workers_threads - 1) ? y_sto : y_start + rowsPerThread;
             int current_y_start = i * rowsPerThread;
 
             threads[i] = new Thread(() -> {
-                double c_re, c_im;
                 int current_y_start_index = current_y_start;
 
                 for (int y = y_start; y < y_end; y++) {
-                    c_im = ymin + (ymax - ymin) * y / ypix;
+                    //c_im = ymin + (ymax - ymin) * y / ypix;
+                    BigDecimal c_im = ymin.add(dy.multiply(BigDecimal.valueOf(y), MC), MC);
     
                     for (int x = 0; x < current_x_length; x++) {
-                        c_re = xmin + (xmax - xmin) * (x_sta + x) / xpix;
+                        //c_re = xmin + (xmax - xmin) * (x_sta + x) / xpix;
+                        BigDecimal c_re = xmin.add(dx.multiply(BigDecimal.valueOf(x_sta + x), MC), MC);
                         int iter = calc(max_iter, max_betrag, c_re, c_im);
                         colors[x][current_y_start_index] = iter;
                     }
@@ -51,17 +58,23 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
         return colors;
     }
 
-    private int calc(int max_iter, double max_betrag, double cr, double ci) {
-        int iter;
-        double zr = 0, zi = 0, zr2 = 0, zi2 = 0, zri = 0, betrag = 0;
-        for (iter = 0; iter < max_iter && betrag <= max_betrag; iter++) {
-            zr = zr2 - zi2 + cr;
-            zi = zri + zri + ci;
-
-            zr2 = zr * zr;
-            zi2 = zi * zi;
-            zri = zr * zi;
-            betrag = zr2 + zi2;
+    private int calc(int max_iter, BigDecimal max_betrag, BigDecimal cr, BigDecimal ci) {
+        int iter = 0;
+        BigDecimal zr = BigDecimal.ZERO;
+        BigDecimal zi = BigDecimal.ZERO;
+        BigDecimal zr2 = BigDecimal.ZERO;
+        BigDecimal zi2 = BigDecimal.ZERO;
+        BigDecimal zri = BigDecimal.ZERO;
+        BigDecimal betrag = BigDecimal.ZERO;
+        
+        while (iter < max_iter && betrag.compareTo(max_betrag) <= 0) {
+            zr = zr2.subtract(zi2, MC).add(cr, MC);
+            zi = zri.add(zri, MC).add(ci, MC);
+            zr2 = zr.multiply(zr, MC);
+            zi2 = zi.multiply(zi, MC);
+            zri = zr.multiply(zi, MC);
+            betrag = zr2.add(zi2, MC);
+            iter++;
         }
         return iter;
     }

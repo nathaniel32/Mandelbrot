@@ -5,6 +5,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
+import java.math.BigDecimal;
 
 public class Master extends UnicastRemoteObject implements MasterInterface {
     private List<WorkerManager> worker_manager_list = new ArrayList<>();
@@ -53,7 +54,7 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
     }
 
     @Override
-    public int[][] bild_rechnen(int workers_threads, int max_iter, double max_betrag, int y_sta, int y_sto, int x_sta, int x_sto, int xpix, int ypix, double xmin, double xmax, double ymin, double ymax) throws RemoteException {
+    public int[][] bild_rechnen(int workers_threads, int max_iter, BigDecimal max_betrag, int y_sta, int y_sto, int x_sta, int x_sto, int xpix, int ypix, BigDecimal xmin, BigDecimal xmax, BigDecimal ymin, BigDecimal ymax) throws RemoteException {
         WorkerManager worker_manager;
         synchronized (this) {
             worker_manager = search_worker();
