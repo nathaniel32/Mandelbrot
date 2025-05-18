@@ -10,7 +10,7 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
 
     @Override
     synchronized public int[][] bild_rechnen_worker(int workers_threads, int max_iter, BigDecimal max_betrag, int y_sta, int y_sto, int x_sta, int x_sto, int xpix, int ypix, BigDecimal xmin, BigDecimal xmax, BigDecimal ymin, BigDecimal ymax) throws RemoteException {
-        
+        System.out.println("y: " + y_sta + " - " + y_sto + "\t| x: " + x_sta + " - " + x_sto);
         int current_y_length = y_sto - y_sta;
         int current_x_length = x_sto - x_sta;
 
