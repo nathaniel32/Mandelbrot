@@ -34,10 +34,8 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
                 return this_worker_manager;
             }else if (selected_worker_manager == null) {
                 selected_worker_manager = this_worker_manager;
-            }else{
-                if (this_worker_manager.aufgabe < selected_worker_manager.aufgabe) {
-                    selected_worker_manager = this_worker_manager;
-                }
+            }else if (this_worker_manager.aufgabe < selected_worker_manager.aufgabe) {
+                selected_worker_manager = this_worker_manager;
             }
         }
         return selected_worker_manager;
