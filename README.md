@@ -33,7 +33,3 @@ javac Client.java
 ```bash
 java Client <Master IP> <Master Port>
 ```
-
-## Hinweise
-- Die Anzahl der Client-Threads sollte mindestens so hoch sein wie die Anzahl der gestarteten Worker.
-- Das Ergebnis des `Ypixel/workerthread` sollte in Ganzzahlen vorliegen, um eine bessere Arbeitsverteilung und zu gewährleisten.
