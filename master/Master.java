@@ -106,7 +106,8 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
             scanner.close();
 
             String masterUrl = "rmi://" + masterIP + ":" + masterPort + "/" + masterService;
-
+            System.setProperty("java.rmi.server.hostname", masterIP);
+            
             Master master = new Master();
             LocateRegistry.createRegistry(masterPort);
             Naming.rebind(masterUrl, master);
