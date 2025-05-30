@@ -1,9 +1,13 @@
+import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Scanner;
 
@@ -69,12 +73,36 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
         return colors;
     }
 
+    public static String getHostIPv4Address() {
+        try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface netInterface = interfaces.nextElement();
+
+                if (!netInterface.isUp() || netInterface.isLoopback() || netInterface.isVirtual()) {
+                    continue;
+                }
+
+                Enumeration<InetAddress> addresses = netInterface.getInetAddresses();
+                while (addresses.hasMoreElements()) {
+                    InetAddress addr = addresses.nextElement();
+
+                    if (addr instanceof Inet4Address && !addr.isLoopbackAddress() && !addr.isLinkLocalAddress()) {
+                        return addr.getHostAddress();
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        return "localhost";
+    }
+
     public static void main(String[] args) {
+        String masterIP = getHostIPv4Address();
+        System.setProperty("java.rmi.server.hostname", masterIP);
         try {
             Scanner scanner = new Scanner(System.in);
-
-            InetAddress localhost = InetAddress.getLocalHost();
-            String masterIP = localhost.getHostAddress();
             int masterPort = -1;
             String masterService = null;
             
@@ -104,15 +132,14 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
             }
 
             scanner.close();
-
-            String masterUrl = "rmi://" + masterIP + ":" + masterPort + "/" + masterService;
-            System.setProperty("java.rmi.server.hostname", masterIP);
             
             Master master = new Master();
             LocateRegistry.createRegistry(masterPort);
+
+            String masterUrl = "rmi://" + masterIP + ":" + masterPort + "/" + masterService;
             Naming.rebind(masterUrl, master);
 
-            System.out.println("\nMaster gestartet...\nURL: " + masterUrl + "\nIP\t: " + masterIP + "\nPort\t: " + masterPort + "\nService\t: " + masterService + "\n");
+            System.out.println("=> Master gestartet...\nURL: " + masterUrl + "\nIP\t: " + masterIP + "\nPort\t: " + masterPort + "\nService\t: " + masterService + "\n");
         } catch (Exception e) {
             System.err.println("Master exception:");
             e.printStackTrace();

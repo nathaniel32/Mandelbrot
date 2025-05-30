@@ -58,7 +58,7 @@ public class Client extends UnicastRemoteObject {
             MasterInterface master = (MasterInterface) java.rmi.registry.LocateRegistry.getRegistry(masterIP, masterPort).lookup(masterService);
             new Client(master);
 
-            System.out.println("\nClient hat Verbindung zum Master hergestellt\nIP\t: " + masterIP + "\nPort\t: " + masterPort + "\nService\t: " + masterService + "\n");
+            System.out.println("=> Client hat Verbindung zum Master hergestellt\nMaster IP\t: " + masterIP + "\nMaster Port\t: " + masterPort + "\nMaster Service\t: " + masterService + "\n");
         } catch (Exception e) {
             System.err.println("Fehler beim Starten des Clients");
             e.printStackTrace();

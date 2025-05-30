@@ -1,5 +1,10 @@
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Enumeration;
 import java.util.Scanner;
 
 public class Worker extends UnicastRemoteObject implements WorkerInterface {
@@ -71,7 +76,35 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
         return iter;
     }
 
+    private static String getHostIPv4Address() {
+        try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface netInterface = interfaces.nextElement();
+
+                if (!netInterface.isUp() || netInterface.isLoopback() || netInterface.isVirtual()) {
+                    continue;
+                }
+
+                Enumeration<InetAddress> addresses = netInterface.getInetAddresses();
+                while (addresses.hasMoreElements()) {
+                    InetAddress addr = addresses.nextElement();
+
+                    if (addr instanceof Inet4Address && !addr.isLoopbackAddress() && !addr.isLinkLocalAddress()) {
+                        return addr.getHostAddress();
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        return "localhost";
+    }
+
     public static void main(String[] args) {
+        String workerIP = getHostIPv4Address();
+        System.setProperty("java.rmi.server.hostname", workerIP);
+        System.out.println("Worker Host IP: " + workerIP);
         try {
             Scanner scanner = new Scanner(System.in);
             String masterIP = null;
@@ -120,7 +153,7 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
 
             master.workerLogin(worker);
 
-            System.out.println("\nWorker hat Verbindung zum Master hergestellt\nIP\t: " + masterIP + "\nPort\t: " + masterPort + "\nService\t: " + masterService + "\n");
+            System.out.println("=> Worker hat Verbindung zum Master hergestellt\nMaster IP\t: " + masterIP + "\nMaster Port\t: " + masterPort + "\nMaster Service\t: " + masterService + "\n");
             System.out.println("Drücke Strg + C zum Trennen");
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
