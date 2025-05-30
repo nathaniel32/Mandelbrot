@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Master extends UnicastRemoteObject implements MasterInterface {
+    static String masterAddress = null;
+    static int masterPort = -1;
+    static String masterService = null;
     private List<WorkerManager> worker_manager_list = new ArrayList<>();
 
     private class WorkerManager {
@@ -73,9 +76,10 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
         return colors;
     }
 
-    public static String getHostIPv4Address() {
+    private static void getHostIPv4Address() {
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            System.out.println("\n=> Address:");
             while (interfaces.hasMoreElements()) {
                 NetworkInterface netInterface = interfaces.nextElement();
 
@@ -85,61 +89,72 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
 
                 Enumeration<InetAddress> addresses = netInterface.getInetAddresses();
                 while (addresses.hasMoreElements()) {
-                    InetAddress addr = addresses.nextElement();
-
-                    if (addr instanceof Inet4Address && !addr.isLoopbackAddress() && !addr.isLinkLocalAddress()) {
-                        return addr.getHostAddress();
+                    InetAddress address = addresses.nextElement();
+                    if (address instanceof Inet4Address && !address.isLoopbackAddress() && !address.isLinkLocalAddress() && !address.isMulticastAddress()) {
+                        System.out.println("Interface\t: " + netInterface.getDisplayName());
+                        System.out.println("IP\t\t: " + address.getHostAddress());
+                        System.out.println("Hostname\t: " + address.getHostName());
+                        System.out.println("-------------------------------------");
                     }
                 }
             }
         } catch (SocketException e) {
             e.printStackTrace();
         }
-        return "localhost";
+    }
+
+    private static void setAddress(String[] args){
+        Scanner scanner = new Scanner(System.in);
+        for (int i = 0; i < args.length; i++) {
+            switch (args[i]) {
+                case "--maddr":
+                    if (i + 1 < args.length) {
+                        masterAddress = args[i + 1];
+                    }
+                    break;
+                case "--mport":
+                    if (i + 1 < args.length) {
+                        masterPort = Integer.parseInt(args[i + 1]);
+                    }
+                    break;
+                case "--mserv":
+                    if (i + 1 < args.length) {
+                        masterService = args[i + 1];
+                    }
+                    break;
+            }
+        }
+
+        if (masterAddress == null) {
+            getHostIPv4Address();
+            System.out.print("IP/Hostname: ");
+            masterAddress = scanner.nextLine();
+        }
+
+        if (masterPort == -1) {
+            System.out.print("Port: ");
+            masterPort = Integer.parseInt(scanner.nextLine());
+        }
+
+        if (masterService == null) {
+            System.out.print("Service: ");
+            masterService = scanner.nextLine().replace(" ", "");
+        }
+
+        scanner.close();
     }
 
     public static void main(String[] args) {
-        String masterIP = getHostIPv4Address();
-        System.setProperty("java.rmi.server.hostname", masterIP);
         try {
-            Scanner scanner = new Scanner(System.in);
-            int masterPort = -1;
-            String masterService = null;
-            
-            for (int i = 0; i < args.length; i++) {
-                switch (args[i]) {
-                    case "--port":
-                        if (i + 1 < args.length) {
-                            masterPort = Integer.parseInt(args[i + 1]);
-                        }
-                        break;
-                    case "--service":
-                        if (i + 1 < args.length) {
-                            masterService = args[i + 1];
-                        }
-                        break;
-                }
-            }
-
-            if (masterPort == -1) {
-                System.out.print("Port: ");
-                masterPort = Integer.parseInt(scanner.nextLine());
-            }
-
-            if (masterService == null) {
-                System.out.print("Service: ");
-                masterService = scanner.nextLine().replace(" ", "");
-            }
-
-            scanner.close();
-            
+            setAddress(args);
+            System.setProperty("java.rmi.server.hostname", masterAddress);
             Master master = new Master();
             LocateRegistry.createRegistry(masterPort);
 
-            String masterUrl = "rmi://" + masterIP + ":" + masterPort + "/" + masterService;
+            String masterUrl = "rmi://" + masterAddress + ":" + masterPort + "/" + masterService;
             Naming.rebind(masterUrl, master);
 
-            System.out.println("=> Master gestartet...\nURL: " + masterUrl + "\nIP\t: " + masterIP + "\nPort\t: " + masterPort + "\nService\t: " + masterService + "\n");
+            System.out.println("\n\n=> Master gestartet...\nURL: " + masterUrl + "\nMaster Address\t: " + masterAddress + "\nMaster Port\t: " + masterPort + "\nMaster Service\t: " + masterService + "\n");
         } catch (Exception e) {
             System.err.println("Master exception:");
             e.printStackTrace();

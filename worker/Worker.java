@@ -8,16 +8,14 @@ import java.util.Enumeration;
 import java.util.Scanner;
 
 public class Worker extends UnicastRemoteObject implements WorkerInterface {
-
+    static String masterAddress = null;
+    static int masterPort = -1;
+    static String masterService = null;
+    static String workerAddress = null;
     Worker() throws RemoteException {}
 
     @Override
-    synchronized public int[][] calculateMandelbrotImage_worker(int workersThreads, int maxIterations, double maxBetrag, int yStart, int yStop, int xStart, int xStop, int xpix, int ypix, double xMinimum, double xMaximum, double yMinimum, double yMaximum) throws RemoteException {
-        //System.out.println("xMinimum: " + xMinimum);
-        //System.out.println("xMaximum: " + xMaximum);
-        //System.out.println("yMinimum: " + yMinimum);
-        //System.out.println("yMaximum: " + yMaximum);
-        
+    synchronized public int[][] calculateMandelbrotImage_worker(int workersThreads, int maxIterations, double maxBetrag, int yStart, int yStop, int xStart, int xStop, int xpix, int ypix, double xMinimum, double xMaximum, double yMinimum, double yMaximum) throws RemoteException {        
         int total_y_length = yStop - yStart;
         int total_x_length = xStop - xStart;
 
@@ -76,9 +74,10 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
         return iter;
     }
 
-    private static String getHostIPv4Address() {
+    private static void getHostIPv4Address() {
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            System.out.println("\n=> Address:");
             while (interfaces.hasMoreElements()) {
                 NetworkInterface netInterface = interfaces.nextElement();
 
@@ -88,72 +87,83 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
 
                 Enumeration<InetAddress> addresses = netInterface.getInetAddresses();
                 while (addresses.hasMoreElements()) {
-                    InetAddress addr = addresses.nextElement();
-
-                    if (addr instanceof Inet4Address && !addr.isLoopbackAddress() && !addr.isLinkLocalAddress()) {
-                        return addr.getHostAddress();
+                    InetAddress address = addresses.nextElement();
+                    if (address instanceof Inet4Address && !address.isLoopbackAddress() && !address.isLinkLocalAddress() && !address.isMulticastAddress()) {
+                        System.out.println("Interface\t: " + netInterface.getDisplayName());
+                        System.out.println("IP\t\t: " + address.getHostAddress());
+                        System.out.println("Hostname\t: " + address.getHostName());
+                        System.out.println("-------------------------------------");
                     }
                 }
             }
         } catch (SocketException e) {
             e.printStackTrace();
         }
-        return "localhost";
+    }
+
+    private static void setAddress(String[] args){
+        Scanner scanner = new Scanner(System.in);
+        for (int i = 0; i < args.length; i++) {
+            switch (args[i]) {
+                case "--maddr":
+                    if (i + 1 < args.length) {
+                        masterAddress = args[i + 1];
+                    }
+                    break;
+                case "--mport":
+                    if (i + 1 < args.length) {
+                        masterPort = Integer.parseInt(args[i + 1]);
+                    }
+                    break;
+                case "--mserv":
+                    if (i + 1 < args.length) {
+                        masterService = args[i + 1];
+                    }
+                    break;
+                case "--waddr":
+                    if (i + 1 < args.length) {
+                        workerAddress = args[i + 1];
+                    }
+                    break;
+            }
+        }
+
+        if (masterAddress == null) {
+            System.out.print("Master IP/Hostname: ");
+            masterAddress = scanner.nextLine();
+        }
+
+        if (masterPort == -1) {
+            System.out.print("Master Port: ");
+            masterPort = Integer.parseInt(scanner.nextLine());
+        }
+        
+        if (masterService == null) {
+            System.out.print("Master Service: ");
+            masterService = scanner.nextLine().replace(" ", "");
+        }
+
+        if (workerAddress == null) {
+            getHostIPv4Address();
+            System.out.print("Worker IP/Hostname: ");
+            workerAddress = scanner.nextLine();
+        }
+
+        scanner.close();
     }
 
     public static void main(String[] args) {
-        String workerIP = getHostIPv4Address();
-        System.setProperty("java.rmi.server.hostname", workerIP);
-        System.out.println("Worker Host IP: " + workerIP);
         try {
-            Scanner scanner = new Scanner(System.in);
-            String masterIP = null;
-            int masterPort = -1;
-            String masterService = null;
+            setAddress(args);
             
-            for (int i = 0; i < args.length; i++) {
-                switch (args[i]) {
-                    case "--ip":
-                        if (i + 1 < args.length) {
-                            masterIP = args[i + 1];
-                        }
-                        break;
-                    case "--port":
-                        if (i + 1 < args.length) {
-                            masterPort = Integer.parseInt(args[i + 1]);
-                        }
-                        break;
-                    case "--service":
-                        if (i + 1 < args.length) {
-                            masterService = args[i + 1];
-                        }
-                        break;
-                }
-            }
+            System.setProperty("java.rmi.server.hostname", workerAddress);
 
-            if (masterIP == null) {
-                System.out.print("Master IP: ");
-                masterIP = scanner.nextLine();
-            }
-
-            if (masterPort == -1) {
-                System.out.print("Master Port: ");
-                masterPort = Integer.parseInt(scanner.nextLine());
-            }
-            
-            if (masterService == null) {
-                System.out.print("Master Service: ");
-                masterService = scanner.nextLine().replace(" ", "");
-            }
-
-            scanner.close();
-
-            MasterInterface master = (MasterInterface) java.rmi.registry.LocateRegistry.getRegistry(masterIP, masterPort).lookup(masterService);
+            MasterInterface master = (MasterInterface) java.rmi.registry.LocateRegistry.getRegistry(masterAddress, masterPort).lookup(masterService);
             Worker worker = new Worker();
 
             master.workerLogin(worker);
 
-            System.out.println("=> Worker hat Verbindung zum Master hergestellt\nMaster IP\t: " + masterIP + "\nMaster Port\t: " + masterPort + "\nMaster Service\t: " + masterService + "\n");
+            System.out.println("\n\n=> Worker hat Verbindung zum Master hergestellt\nMaster Address\t: " + masterAddress + "\nMaster Port\t: " + masterPort + "\nMaster Service\t: " + masterService + "\n");
             System.out.println("Drücke Strg + C zum Trennen");
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
