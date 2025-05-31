@@ -137,28 +137,30 @@ public class ClientModel {
         @Override
         public void run() {
             try {
-                int resultY_index = 0;
-                int resultX_index = 0;
                 int[][] result = master.calculateMandelbrotImage(p.workersThreads, worker_maxIterations, p.maxBetrag, worker_yStart, worker_yStopp,  worker_xStartrt, worker_xStopp, p.xpix, p.ypix, worker_xMinimum, worker_xMaximum, worker_yMinimum, worker_yMaximum);
-                for (int y = worker_yStart; y < worker_yStopp; y++) {
-                    for (int x = worker_xStartrt; x < worker_xStopp; x++) {
-                        int iter = result[resultX_index][resultY_index];
-                        
-                        if(iter == worker_maxIterations){
-                            bild[worker_stufenanzahl][x][y] = Color.BLACK;
-                        }else{
-                            double zn = Math.log(x * x + y * y) / 2;
-                            double nu = Math.log(zn / Math.log(2)) / Math.log(2);
-                            float smoothIter = (float)(iter + 1 - nu);
-                            float hue = 0.95f + 10f * smoothIter / worker_maxIterations * p.farbe_number;
-                            bild[worker_stufenanzahl][x][y] = Color.getHSBColor(hue % 1f, 0.6f, 1f);
+                new Thread(() -> {
+                    int resultY_index = 0;
+                    int resultX_index = 0;
+                    for (int y = worker_yStart; y < worker_yStopp; y++) {
+                        for (int x = worker_xStartrt; x < worker_xStopp; x++) {
+                            int iter = result[resultX_index][resultY_index];
+                            
+                            if(iter == worker_maxIterations){
+                                bild[worker_stufenanzahl][x][y] = Color.BLACK;
+                            }else{
+                                double zn = Math.log(x * x + y * y) / 2;
+                                double nu = Math.log(zn / Math.log(2)) / Math.log(2);
+                                float smoothIter = (float)(iter + 1 - nu);
+                                float hue = 0.95f + 10f * smoothIter / worker_maxIterations * p.farbe_number;
+                                bild[worker_stufenanzahl][x][y] = Color.getHSBColor(hue % 1f, 0.6f, 1f);
+                            }
+                            
+                            resultX_index++;
                         }
-                        
-                        resultX_index++;
+                        resultX_index = 0;
+                        resultY_index++;
                     }
-                    resultX_index = 0;
-                    resultY_index++;
-                }
+                }).start();
             } catch (RemoteException e) {
                 p.stopVideo = true;
                 String message = "Worker/Master Error!";
