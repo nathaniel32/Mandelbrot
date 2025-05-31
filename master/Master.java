@@ -156,7 +156,7 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
 
         if (masterAddress == null) {
             getHostIPv4Address();
-            System.out.print("IP/Hostname: ");
+            System.out.print("Master IP/Hostname: ");
             masterAddress = scanner.nextLine();
         }
 
