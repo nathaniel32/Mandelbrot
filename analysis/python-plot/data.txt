@@ -8,16 +8,12 @@ worker_3 = Intel i7 Gen 8
 * Chunks per Worker
   - worker_1    : 1200  (100,00%)
 
-xmax: -0.3483730867207764
-
 ============ Summary ============
 * Time          : 29229 ms
 * Total Chunks  : 1200
 * Chunks per Worker
   - worker_1    : 547   (45,58%)
   - worker_2    : 653   (54,42%)
-
-xmax: -0.3483730867207764
 
 ============ Summary ============
 * Time          : 12771 ms
