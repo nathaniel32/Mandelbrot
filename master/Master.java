@@ -85,6 +85,7 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
         String[] result = new String[worker_manager_list.size()];
         int i = 0;
         for (WorkerManager wm : worker_manager_list) {
+            if (wm.aufgabe != 0) System.out.println("\n" + wm.worker_id + " is error!\nActive Task: " + wm.aufgabe);
             double percentage = wm.totalAufgabe == 0 ? 0 : ((double) wm.totalAufgabe / totalChunks) * 100;
             result[i] = String.format("  - %s\t: %d\t(%.2f%%)", wm.worker_id, wm.totalAufgabe, percentage);
             wm.totalAufgabe = 0;
