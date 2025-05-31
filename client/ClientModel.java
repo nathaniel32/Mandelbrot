@@ -99,7 +99,11 @@ public class ClientModel {
         }
 
         try {
-            master.getSummary();
+            String[] summary = master.getSummary();
+            System.out.println("\nSummary Chunks/Worker");
+            for (String line : summary) {
+                System.out.println(line);
+            }
         } catch (RemoteException e) {
             String message = "Summary Error";
             p.v.showInfo(message);

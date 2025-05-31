@@ -73,12 +73,15 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
     }
 
     @Override
-    public void getSummary() {
-        System.out.println("\nSummary Chunks/Worker");
+    public String[] getSummary() {
+        String[] result = new String[worker_manager_list.size()];
+        int i = 0;
         for (WorkerManager wm : worker_manager_list) {
-            System.out.println(wm.worker_id + "\t: " + wm.totalAufgabe);
+            result[i] = wm.worker_id + "\t: " + wm.totalAufgabe;
             wm.totalAufgabe = 0;
+            i++;
         }
+        return result;
     }
 
     @Override
