@@ -159,13 +159,13 @@ public class ClientModel {
                     resultX_index = 0;
                     resultY_index++;
                 }
-                getChunk();
             } catch (RemoteException e) {
                 p.stopVideo = true;
                 String message = "Worker/Master Error!";
                 p.v.showInfo(message);
                 System.out.println(message);
             }
+            getChunk();
         }
     }
 }

@@ -41,15 +41,21 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
 
     private WorkerManager searchWorker() throws RemoteException{
         WorkerManager selected_worker_manager = null;
-        for (WorkerManager this_worker_manager : worker_manager_list) {
+        for (WorkerManager wm : worker_manager_list) {
             //System.out.println(this_worker_manager.worker + ", " + this_worker_manager.aufgabe);
-            if (this_worker_manager.aufgabe == 0) {
-                return this_worker_manager;
-            }else if (selected_worker_manager == null) {
-                selected_worker_manager = this_worker_manager;
-            }else if (this_worker_manager.aufgabe < selected_worker_manager.aufgabe) {
-                selected_worker_manager = this_worker_manager;
+
+            if (wm.aufgabe == 0) {
+                return wm;
             }
+
+            if (selected_worker_manager == null || wm.aufgabe < selected_worker_manager.aufgabe) {
+                selected_worker_manager = wm;
+            }
+        }
+
+        if (selected_worker_manager == null) {
+            System.out.println("ERROR: No valid worker found!");
+            throw new RemoteException("No valid worker found.");
         }
         return selected_worker_manager;
     }
@@ -62,12 +68,27 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
         } */
     }
 
+    private void removeWorker(WorkerManager worker){
+        if (worker_manager_list.remove(worker)) {
+            System.out.println("Worker removed: " + worker.worker_id);
+        } else {
+            System.out.println("Worker not found: " + worker.worker_id);
+        }
+        printActiveWorkers();
+    }
+
     Master() throws RemoteException {}
 
     @Override
     public void workerLogout(WorkerInterface worker){
-        worker_manager_list.removeIf(manager -> manager.getWorker().equals(worker));
-        printActiveWorkers();
+        //worker_manager_list.removeIf(manager -> manager.getWorker().equals(worker));
+        
+        for (WorkerManager wm : worker_manager_list) {
+            if (wm.getWorker().equals(worker)) {
+                removeWorker(wm);
+                break;
+            }
+        }
     }
 
     @Override
@@ -82,14 +103,22 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
 
     @Override
     public String[] getSummary(int totalChunks) {
+        List<WorkerManager> toRemove = new ArrayList<>();
         String[] result = new String[worker_manager_list.size()];
         int i = 0;
         for (WorkerManager wm : worker_manager_list) {
-            if (wm.aufgabe != 0) System.out.println("\n" + wm.worker_id + " is error!\nActive Task: " + wm.aufgabe);
             double percentage = wm.totalAufgabe == 0 ? 0 : ((double) wm.totalAufgabe / totalChunks) * 100;
             result[i] = String.format("  - %s\t: %d\t(%.2f%%)", wm.worker_id, wm.totalAufgabe, percentage);
             wm.totalAufgabe = 0;
             i++;
+
+            if (wm.aufgabe != 0){
+                toRemove.add(wm);
+            };
+        }
+        for (WorkerManager wm : toRemove) {
+            System.out.println("\n" + wm.worker_id + " is error!\nActive Task: " + wm.aufgabe);
+            removeWorker(wm);
         }
         return result;
     }
