@@ -15,10 +15,12 @@ public class Client extends UnicastRemoteObject implements ClientInterface{
 
     @Override
     public void draw_mandelbrot(Color[][] bild, int round){
-        p.v.update(bild);
-        p.v.update_info("Round: " + round);
-        p.currentTime = System.currentTimeMillis();
-        p.v.update_time(p.currentTime-p.startTime);
+        new Thread(() -> {
+            p.v.update(bild);
+            p.v.update_info("Round: " + round);
+            p.currentTime = System.currentTimeMillis();
+            p.v.update_time(p.currentTime-p.startTime);
+        }).start();
     }
 
     public static void main(String[] args) {
