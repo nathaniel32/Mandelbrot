@@ -258,7 +258,7 @@ public class ClientView {
         p.yMaximum = Double.parseDouble(input_yMaximum.getText());
         //auto xmax
         p.xMaximum = ((double) p.xpix / p.ypix) * (p.yMaximum - p.yMinimum) + p.xMinimum;
-        System.out.println("xmax: " + p.xMaximum);
+        System.out.println("\nxmax: " + p.xMaximum);
     }
 
     public void updatePanel(Color[][] c) {

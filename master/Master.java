@@ -54,12 +54,20 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
         return selected_worker_manager;
     }
 
+    private void printActiveWorkers(){
+        System.out.println("\nActive Worker: " + worker_manager_list.size());
+        
+        /* for (WorkerManager manager : worker_manager_list) {
+            System.out.println("ID: " + manager.worker_id);
+        } */
+    }
+
     Master() throws RemoteException {}
 
     @Override
     public void workerLogout(WorkerInterface worker){
         worker_manager_list.removeIf(manager -> manager.getWorker().equals(worker));
-        System.out.println("Active Worker: " + worker_manager_list.size());
+        printActiveWorkers();
     }
 
     @Override
@@ -67,8 +75,8 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
         String workerID = "worker_" + workerIdIndex;
         WorkerManager worker_manager = new WorkerManager(worker, workerID);
         worker_manager_list.add(worker_manager);
-        System.out.println("Active Worker: " + worker_manager_list.size());
         workerIdIndex++;
+        printActiveWorkers();
         return workerID;
     }
 
