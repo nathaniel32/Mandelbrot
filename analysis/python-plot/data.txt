@@ -26,6 +26,3 @@ xmax: -0.3483730867207764
   - worker_1    : 229   (19,08%)
   - worker_2    : 274   (22,83%)
   - worker_3    : 697   (58,08%)
-
-
-tolong buatkan grafik
