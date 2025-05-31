@@ -13,8 +13,7 @@ public class ClientPresenter {
     boolean restartVideo = false;
     boolean isEnd = false;
     boolean stopVideo = false;
-    long startTime;
-    long currentTime;
+    long startTime, currentTime, time_stamp;
     Color[][][] mandel_result;
     int client_threads, workersThreads, maxIterations, yChunk, xChunk;
     int xpix, ypix;

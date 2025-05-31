@@ -60,7 +60,8 @@ public class ClientModel {
             }
         }
         p.currentTime = System.currentTimeMillis();
-        p.v.update_time(p.currentTime - p.startTime);
+        p.time_stamp = p.currentTime - p.startTime;
+        p.v.update_time(p.time_stamp);
         p.v.showInfo("Chunks: " + indexstufenanzahlChunk + "/" + totalThread + " | Stufenanzahl: " + indexstufenanzahl + " | Max-Iterations: " + p.maxIterations + " | Threads: " + Thread.activeCount());
     }
 
@@ -100,11 +101,13 @@ public class ClientModel {
 
         try {
             String[] summary = master.getSummary(indexstufenanzahlChunk);
-            System.out.println("\nSummary Chunks/Worker");
+            System.out.println("\n============ Summary ============");
+            System.out.println("* Time\t\t: " + p.time_stamp + " ms");
+            System.out.println("* Total Chunks\t: " + indexstufenanzahlChunk);
+            System.out.println("* Chunks per Worker");
             for (String line : summary) {
                 System.out.println(line);
             }
-            System.out.println("Total Chunks\t: " + indexstufenanzahlChunk);
         } catch (RemoteException e) {
             String message = "Summary Error";
             p.v.showInfo(message);
