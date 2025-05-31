@@ -99,11 +99,12 @@ public class ClientModel {
         }
 
         try {
-            String[] summary = master.getSummary();
+            String[] summary = master.getSummary(indexstufenanzahlChunk);
             System.out.println("\nSummary Chunks/Worker");
             for (String line : summary) {
                 System.out.println(line);
             }
+            System.out.println("Total Chunks\t: " + indexstufenanzahlChunk);
         } catch (RemoteException e) {
             String message = "Summary Error";
             p.v.showInfo(message);

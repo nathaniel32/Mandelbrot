@@ -81,11 +81,12 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
     }
 
     @Override
-    public String[] getSummary() {
+    public String[] getSummary(int totalChunks) {
         String[] result = new String[worker_manager_list.size()];
         int i = 0;
         for (WorkerManager wm : worker_manager_list) {
-            result[i] = wm.worker_id + "\t: " + wm.totalAufgabe;
+            double percentage = wm.totalAufgabe == 0 ? 0 : ((double) wm.totalAufgabe / totalChunks) * 100;
+            result[i] = String.format("%s\t: %d\t(%.2f%%)", wm.worker_id, wm.totalAufgabe, percentage);
             wm.totalAufgabe = 0;
             i++;
         }
