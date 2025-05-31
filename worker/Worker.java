@@ -161,10 +161,11 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
             MasterInterface master = (MasterInterface) java.rmi.registry.LocateRegistry.getRegistry(masterAddress, masterPort).lookup(masterService);
             Worker worker = new Worker();
 
-            master.workerLogin(worker);
+            String worker_id = master.workerLogin(worker);
 
             System.out.println("\n\n=> Worker hat Verbindung zum Master hergestellt\nMaster Address\t: " + masterAddress + "\nMaster Port\t: " + masterPort + "\nMaster Service\t: " + masterService + "\n");
             System.out.println("Drücke Strg + C zum Trennen");
+            System.out.println("ID: " + worker_id);
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
                     master.workerLogout(worker);

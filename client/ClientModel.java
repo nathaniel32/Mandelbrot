@@ -97,6 +97,14 @@ public class ClientModel {
                 e.printStackTrace();
             }
         }
+
+        try {
+            master.getSummary();
+        } catch (RemoteException e) {
+            String message = "Summary Error";
+            p.v.showInfo(message);
+        }
+        
         return bild;
     }
 

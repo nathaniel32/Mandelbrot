@@ -15,21 +15,26 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
     static String masterAddress = null;
     static int masterPort = -1;
     static String masterService = null;
+    private int workerIdIndex = 1;
     private List<WorkerManager> worker_manager_list = new ArrayList<>();
 
     private class WorkerManager {
-        public WorkerInterface worker;
-        public int aufgabe = 0;
-        public WorkerManager(WorkerInterface worker) {
+        private WorkerInterface worker;
+        private String worker_id;
+        private int aufgabe = 0;
+        private int totalAufgabe = 0;
+        private WorkerManager(WorkerInterface worker, String worker_id) {
             this.worker = worker;
+            this.worker_id = worker_id;
         }
-        public void worker_arbeit_start() {
+        private void worker_arbeit_start() {
             aufgabe++;
+            totalAufgabe++;
         }
-        public void worker_arbeit_end() {
+        private void worker_arbeit_end() {
             aufgabe--;
         }
-        public WorkerInterface getWorker() {
+        private WorkerInterface getWorker() {
             return worker;
         }
     }
@@ -58,10 +63,22 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
     }
 
     @Override
-    public void workerLogin(WorkerInterface worker){
-        WorkerManager worker_manager = new WorkerManager(worker);
+    synchronized public String workerLogin(WorkerInterface worker){
+        String workerID = "worker_" + workerIdIndex;
+        WorkerManager worker_manager = new WorkerManager(worker, workerID);
         worker_manager_list.add(worker_manager);
         System.out.println("Active Worker: " + worker_manager_list.size());
+        workerIdIndex++;
+        return workerID;
+    }
+
+    @Override
+    public void getSummary() {
+        System.out.println("\nSummary Chunks/Worker");
+        for (WorkerManager wm : worker_manager_list) {
+            System.out.println(wm.worker_id + "\t: " + wm.totalAufgabe);
+            wm.totalAufgabe = 0;
+        }
     }
 
     @Override
