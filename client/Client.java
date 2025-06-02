@@ -38,12 +38,12 @@ public class Client extends UnicastRemoteObject {
 
         if (masterAddress == null) {
             System.out.print("Master IP/Hostname: ");
-            masterAddress = scanner.nextLine();
+            masterAddress = scanner.nextLine().replace(" ", "");
         }
 
         if (masterPort == -1) {
             System.out.print("Master Port: ");
-            masterPort = Integer.parseInt(scanner.nextLine());
+            masterPort = Integer.parseInt(scanner.nextLine().replace(" ", ""));
         }
 
         if (masterService == null) {

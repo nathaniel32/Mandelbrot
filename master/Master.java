@@ -187,12 +187,12 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
         if (masterAddress == null) {
             getHostIPv4Address();
             System.out.print("Master IP/Hostname: ");
-            masterAddress = scanner.nextLine();
+            masterAddress = scanner.nextLine().replace(" ", "");
         }
 
         if (masterPort == -1) {
             System.out.print("Port: ");
-            masterPort = Integer.parseInt(scanner.nextLine());
+            masterPort = Integer.parseInt(scanner.nextLine().replace(" ", ""));
         }
 
         if (masterService == null) {

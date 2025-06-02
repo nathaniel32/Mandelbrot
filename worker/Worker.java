@@ -130,12 +130,12 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
 
         if (masterAddress == null) {
             System.out.print("Master IP/Hostname: ");
-            masterAddress = scanner.nextLine();
+            masterAddress = scanner.nextLine().replace(" ", "");
         }
 
         if (masterPort == -1) {
             System.out.print("Master Port: ");
-            masterPort = Integer.parseInt(scanner.nextLine());
+            masterPort = Integer.parseInt(scanner.nextLine().replace(" ", ""));
         }
         
         if (masterService == null) {
@@ -146,7 +146,7 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
         if (workerAddress == null) {
             getHostIPv4Address();
             System.out.print("Worker IP/Hostname: ");
-            workerAddress = scanner.nextLine();
+            workerAddress = scanner.nextLine().replace(" ", "");
         }
 
         scanner.close();
