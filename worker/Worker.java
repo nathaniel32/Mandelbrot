@@ -1,17 +1,7 @@
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Enumeration;
-import java.util.Scanner;
 
 public class Worker extends UnicastRemoteObject implements WorkerInterface {
-    static String masterAddress = null;
-    static int masterPort = -1;
-    static String masterService = null;
-    static String workerAddress = null;
     Worker() throws RemoteException {}
 
     @Override
@@ -74,96 +64,18 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
         return iter;
     }
 
-    private static void getHostIPv4Address() {
-        try {
-            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-            System.out.println("\n=> Address:");
-            while (interfaces.hasMoreElements()) {
-                NetworkInterface netInterface = interfaces.nextElement();
-
-                if (!netInterface.isUp() || netInterface.isLoopback() || netInterface.isVirtual()) {
-                    continue;
-                }
-
-                Enumeration<InetAddress> addresses = netInterface.getInetAddresses();
-                while (addresses.hasMoreElements()) {
-                    InetAddress address = addresses.nextElement();
-                    if (address instanceof Inet4Address && !address.isLoopbackAddress() && !address.isLinkLocalAddress() && !address.isMulticastAddress()) {
-                        System.out.println("Interface\t: " + netInterface.getDisplayName());
-                        System.out.println("IP\t\t: " + address.getHostAddress());
-                        System.out.println("Hostname\t: " + address.getHostName());
-                        System.out.println("-------------------------------------");
-                    }
-                }
-            }
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void setAddress(String[] args){
-        Scanner scanner = new Scanner(System.in);
-        for (int i = 0; i < args.length; i++) {
-            switch (args[i]) {
-                case "--maddr":
-                    if (i + 1 < args.length) {
-                        masterAddress = args[i + 1];
-                    }
-                    break;
-                case "--mport":
-                    if (i + 1 < args.length) {
-                        masterPort = Integer.parseInt(args[i + 1]);
-                    }
-                    break;
-                case "--mserv":
-                    if (i + 1 < args.length) {
-                        masterService = args[i + 1];
-                    }
-                    break;
-                case "--waddr":
-                    if (i + 1 < args.length) {
-                        workerAddress = args[i + 1];
-                    }
-                    break;
-            }
-        }
-
-        if (masterAddress == null) {
-            System.out.print("Master IP/Hostname: ");
-            masterAddress = scanner.nextLine().replace(" ", "");
-        }
-
-        if (masterPort == -1) {
-            System.out.print("Master Port: ");
-            masterPort = Integer.parseInt(scanner.nextLine().replace(" ", ""));
-        }
-        
-        if (masterService == null) {
-            System.out.print("Master Service: ");
-            masterService = scanner.nextLine().replace(" ", "");
-        }
-
-        if (workerAddress == null) {
-            getHostIPv4Address();
-            System.out.print("Worker IP/Hostname: ");
-            workerAddress = scanner.nextLine().replace(" ", "");
-        }
-
-        scanner.close();
-    }
-
     public static void main(String[] args) {
         try {
-            setAddress(args);
+            NetworkConfig rmiconfig = new NetworkConfig(args);
             
-            System.setProperty("java.rmi.server.hostname", workerAddress);
+            System.setProperty("java.rmi.server.hostname", rmiconfig.getLocalAddress());
 
-            MasterInterface master = (MasterInterface) java.rmi.registry.LocateRegistry.getRegistry(masterAddress, masterPort).lookup(masterService);
+            MasterInterface master = (MasterInterface) java.rmi.registry.LocateRegistry.getRegistry(rmiconfig.getTargetAddress(), rmiconfig.getMasterPort()).lookup(rmiconfig.getMasterService());
             Worker worker = new Worker();
 
             String worker_id = master.workerLogin(worker);
 
-            System.out.println("\n\n=> Worker hat Verbindung zum Master hergestellt\nMaster Address\t: " + masterAddress + "\nMaster Port\t: " + masterPort + "\nMaster Service\t: " + masterService + "\n");
+            System.out.println("\n\n=> Worker hat Verbindung zum Master hergestellt\nMaster Address\t: " + rmiconfig.getTargetAddress() + "\nMaster Port\t: " + rmiconfig.getMasterPort() + "\nMaster Service\t: " + rmiconfig.getMasterService() + "\n");
             System.out.println("Drücke Strg + C zum Trennen");
             System.out.println("ID: " + worker_id);
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {

@@ -1,20 +1,11 @@
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.Scanner;
 
 public class Master extends UnicastRemoteObject implements MasterInterface {
-    static String masterAddress = null;
-    static int masterPort = -1;
-    static String masterService = null;
     private int workerIdIndex = 1;
     private List<WorkerManager> worker_manager_list = new ArrayList<>();
 
@@ -135,85 +126,18 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
         return colors;
     }
 
-    private static void getHostIPv4Address() {
-        try {
-            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-            System.out.println("\n=> Address:");
-            while (interfaces.hasMoreElements()) {
-                NetworkInterface netInterface = interfaces.nextElement();
-
-                if (!netInterface.isUp() || netInterface.isLoopback() || netInterface.isVirtual()) {
-                    continue;
-                }
-
-                Enumeration<InetAddress> addresses = netInterface.getInetAddresses();
-                while (addresses.hasMoreElements()) {
-                    InetAddress address = addresses.nextElement();
-                    if (address instanceof Inet4Address && !address.isLoopbackAddress() && !address.isLinkLocalAddress() && !address.isMulticastAddress()) {
-                        System.out.println("Interface\t: " + netInterface.getDisplayName());
-                        System.out.println("IP\t\t: " + address.getHostAddress());
-                        System.out.println("Hostname\t: " + address.getHostName());
-                        System.out.println("-------------------------------------");
-                    }
-                }
-            }
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void setAddress(String[] args){
-        Scanner scanner = new Scanner(System.in);
-        for (int i = 0; i < args.length; i++) {
-            switch (args[i]) {
-                case "--maddr":
-                    if (i + 1 < args.length) {
-                        masterAddress = args[i + 1];
-                    }
-                    break;
-                case "--mport":
-                    if (i + 1 < args.length) {
-                        masterPort = Integer.parseInt(args[i + 1]);
-                    }
-                    break;
-                case "--mserv":
-                    if (i + 1 < args.length) {
-                        masterService = args[i + 1];
-                    }
-                    break;
-            }
-        }
-
-        if (masterAddress == null) {
-            getHostIPv4Address();
-            System.out.print("Master IP/Hostname: ");
-            masterAddress = scanner.nextLine().replace(" ", "");
-        }
-
-        if (masterPort == -1) {
-            System.out.print("Port: ");
-            masterPort = Integer.parseInt(scanner.nextLine().replace(" ", ""));
-        }
-
-        if (masterService == null) {
-            System.out.print("Service: ");
-            masterService = scanner.nextLine().replace(" ", "");
-        }
-
-        scanner.close();
-    }
-
     public static void main(String[] args) {
         try {
-            setAddress(args);
-            System.setProperty("java.rmi.server.hostname", masterAddress);
-            Master master = new Master();
-            LocateRegistry.createRegistry(masterPort);
+            NetworkConfig rmiconfig = new NetworkConfig(args);
 
-            String masterUrl = "rmi://" + masterAddress + ":" + masterPort + "/" + masterService;
+            System.setProperty("java.rmi.server.hostname", rmiconfig.getLocalAddress());
+            Master master = new Master();
+            LocateRegistry.createRegistry(rmiconfig.getMasterPort());
+
+            String masterUrl = "rmi://" + rmiconfig.getLocalAddress() + ":" + rmiconfig.getMasterPort() + "/" + rmiconfig.getMasterService();
             Naming.rebind(masterUrl, master);
 
-            System.out.println("\n\n=> Master gestartet...\nURL: " + masterUrl + "\nMaster Address\t: " + masterAddress + "\nMaster Port\t: " + masterPort + "\nMaster Service\t: " + masterService + "\n");
+            System.out.println("\n\n=> Master gestartet...\nURL: " + masterUrl + "\nMaster Address\t: " + rmiconfig.getLocalAddress() + "\nMaster Port\t: " + rmiconfig.getMasterPort() + "\nMaster Service\t: " + rmiconfig.getMasterService() + "\n");
         } catch (Exception e) {
             System.err.println("Master exception:");
             e.printStackTrace();
