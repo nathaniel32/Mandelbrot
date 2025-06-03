@@ -100,7 +100,7 @@ public class NetworkConfig {
     public String getLocalAddress() {
         if (localAddress == null) {
             getHostIPv4Address();
-            System.out.print("Worker IP/Hostname: ");
+            System.out.print("Local IP/Hostname: ");
             localAddress = scanner.nextLine().replace(" ", "");
         }
         return localAddress;
