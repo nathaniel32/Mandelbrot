@@ -75,7 +75,7 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
                     int xStart = indexChunkX * columnPerBlock;
                     int x_end = (indexChunkX == xChunk - 1) ? xpix : xStart + columnPerBlock;
 
-                    threads[indexstufenanzahlChunk] = new Thread(new MandelbrotWorker(this, yStart, y_end, xStart, x_end, indexstufenanzahl, maxIterations, xMinimum, xMaximum, yMinimum, yMaximum));
+                    threads[indexstufenanzahlChunk] = new Thread(new MandelbrotChunk(this, yStart, y_end, xStart, x_end, indexstufenanzahl, maxIterations, xMinimum, xMaximum, yMinimum, yMaximum));
                     threads[indexstufenanzahlChunk].start();
 
                     indexChunkX++;
