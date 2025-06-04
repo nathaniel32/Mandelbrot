@@ -17,7 +17,7 @@ public class ClientPresenter {
     double xMinimum, xMaximum, yMinimum, yMaximum;
     double cr, ci;
     double zoomfaktor;
-    int client_threads, workersThreads, maxIterations, yChunk, xChunk;
+    int master_threads, workersThreads, maxIterations, yChunk, xChunk;
     int xpix, ypix;
     double maxBetrag, add_iter;
     float farbe_number;
@@ -41,7 +41,7 @@ public class ClientPresenter {
             v.input_zoom_rate.setText(config_properties.getProperty("input.zoomfaktor"));
             v.input_chunk_y.setText(config_properties.getProperty("input.chunk_y"));
             v.input_chunk_x.setText(config_properties.getProperty("input.chunk_x"));
-            v.input_client_threads.setText(config_properties.getProperty("input.client_threads"));
+            v.input_master_threads.setText(config_properties.getProperty("input.master_threads"));
             v.input_workersThreads.setText(config_properties.getProperty("input.workersThreads"));
             v.input_stufenanzahl.setText(config_properties.getProperty("input.stufenanzahl"));
             v.input_xMinimum.setText(config_properties.getProperty("input.xMinimum"));

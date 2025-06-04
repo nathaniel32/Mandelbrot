@@ -14,7 +14,7 @@ public class ClientView {
     private MandelbrotPanel mandelbrot_panel = new MandelbrotPanel();
     JFrame frame_home;
     int input_controlWidth = 0;
-    JTextField input_xMinimum, input_yMinimum, input_yMaximum, input_xpix, input_ypix, input_add_iter, input_maxBetrag, input_farbe, input_cr, input_ci, input_zoom_rate, input_client_threads, input_maxIterations, input_chunk_y, input_chunk_x, input_stufenanzahl, input_workersThreads;
+    JTextField input_xMinimum, input_yMinimum, input_yMaximum, input_xpix, input_ypix, input_add_iter, input_maxBetrag, input_farbe, input_cr, input_ci, input_zoom_rate, input_master_threads, input_maxIterations, input_chunk_y, input_chunk_x, input_stufenanzahl, input_workersThreads;
     private JLabel label_stufenanzahl = new JLabel("Stufenanzahl:");
     private JLabel label_maxIterationsations = new JLabel("Start Max Iterations:");
     private JLabel label_add_iterations = new JLabel("Add Max Iterations:");
@@ -24,7 +24,7 @@ public class ClientView {
     private JLabel label_farbe = new JLabel("Farbe:");
     private JLabel label_chunk_y = new JLabel("*YChunks/Bild:");
     private JLabel label_chunk_x = new JLabel("*XChunks/Bild:");
-    private JLabel label_client_threads = new JLabel("Client Threads:");
+    private JLabel label_master_threads = new JLabel("Master Threads:");
     private JLabel label_workersThreads = new JLabel("*Workers-Threads/YChunk:");
     private JLabel label_x_mininum = new JLabel("X Mininum");
     private JLabel label_y_mininum = new JLabel("Y Mininum");
@@ -63,7 +63,7 @@ public class ClientView {
         input_zoom_rate = new JTextField("0.0");
         input_chunk_y = new JTextField("0");
         input_chunk_x = new JTextField("0");
-        input_client_threads = new JTextField("0");
+        input_master_threads = new JTextField("0");
         input_workersThreads = new JTextField("0");
         input_stufenanzahl = new JTextField("0");
         layout_home.add(label_info);
@@ -108,8 +108,8 @@ public class ClientView {
         layout_home.add(label_workersThreads);
         layout_home.add(input_workersThreads);
 
-        layout_home.add(label_client_threads);
-        layout_home.add(input_client_threads);
+        layout_home.add(label_master_threads);
+        layout_home.add(input_master_threads);
 
         layout_home.add(label_x_mininum);
         layout_home.add(input_xMinimum);
@@ -184,8 +184,8 @@ public class ClientView {
         layout_mandel.add(label_workersThreads);
         layout_mandel.add(input_workersThreads);
 
-        layout_mandel.add(label_client_threads);
-        layout_mandel.add(input_client_threads);
+        layout_mandel.add(label_master_threads);
+        layout_mandel.add(input_master_threads);
 
         layout_mandel.add(label_x_mininum);
         layout_mandel.add(input_xMinimum);
@@ -229,7 +229,7 @@ public class ClientView {
         p.cr = Double.parseDouble(input_cr.getText());
         p.ci = Double.parseDouble(input_ci.getText());
         p.zoomfaktor = Double.parseDouble(input_zoom_rate.getText());
-        p.client_threads = Integer.parseInt(input_client_threads.getText());
+        p.master_threads = Integer.parseInt(input_master_threads.getText());
         p.maxIterations = Integer.parseInt(input_maxIterations.getText());
         p.add_iter = Double.parseDouble(input_add_iter.getText());
         p.yChunk = Integer.parseInt(input_chunk_y.getText());

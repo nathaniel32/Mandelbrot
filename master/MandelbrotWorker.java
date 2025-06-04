@@ -24,10 +24,10 @@ public class MandelbrotWorker implements Runnable{
     public void run() {
         try {
             int[][] result = master.calculateMandelbrotImage(master.workersThreads, worker_maxIterations, master.maxBetrag, worker_yStart, worker_yStop,  worker_xStart, worker_xStop, master.xpix, master.ypix, worker_xMinimum, worker_xMaximum, worker_yMinimum, worker_yMaximum);
-            master.client.setResultMandelbrot(result, master.indexstufenanzahlChunk, master.totalThread, master.indexstufenanzahl, worker_yStart, worker_yStop, worker_xStart, worker_xStop, worker_maxIterations, worker_stufenanzahl);
+            master.client.setResultMandelbrot(result, master.indexstufenanzahlChunk, master.totalThread, master.indexstufenanzahl, worker_yStart, worker_yStop, worker_xStart, worker_xStop, worker_maxIterations, worker_stufenanzahl, Thread.activeCount());
         } catch (RemoteException e) {
             master.stopVideo = true;
-            String message = "Worker/Master Error!";
+            String message = "Worker Error!";
             //p.v.showInfo(message);
             System.out.println(message);
         }

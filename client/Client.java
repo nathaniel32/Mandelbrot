@@ -12,12 +12,12 @@ public class Client extends UnicastRemoteObject implements ClientInterface{
     }
 
     @Override
-    public void setResultMandelbrot(int[][] result, int indexstufenanzahlChunk, int totalThread, int indexstufenanzahl, int worker_yStart, int worker_yStop, int worker_xStart, int worker_xStop, int worker_maxIterations, int worker_stufenanzahl){
+    public void setResultMandelbrot(int[][] result, int indexstufenanzahlChunk, int totalThread, int indexstufenanzahl, int worker_yStart, int worker_yStop, int worker_xStart, int worker_xStop, int worker_maxIterations, int worker_stufenanzahl, int master_thread){
         new Thread(() -> {
             p.currentTime = System.currentTimeMillis();
             p.time_stamp = p.currentTime - p.startTime;
             p.v.update_time(p.time_stamp);
-            p.v.showInfo("Chunks: " + indexstufenanzahlChunk + "/" + totalThread + " | Stufenanzahl: " + indexstufenanzahl + " | Max-Iterations: " + worker_maxIterations + " | Client-Threads: " + Thread.activeCount());
+            p.v.showInfo("Chunks: " + indexstufenanzahlChunk + "/" + totalThread + " | Stufenanzahl: " + indexstufenanzahl + " | Max-Iterations: " + worker_maxIterations + " | Client-Threads: " + Thread.activeCount() + " | Master-Threads: " + master_thread);
 
             int resultY_index = 0;
             int resultX_index = 0;

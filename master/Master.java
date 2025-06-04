@@ -12,10 +12,13 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
     boolean stopVideo = false;
     int xpix;
     int ypix;
+    double maxBetrag;
+    int workersThreads;
+    int totalThread;
+    int indexstufenanzahl, indexstufenanzahlChunk;
     private int stufenanzahl;
     private int maxIterations;
     private double add_iter;
-    double maxBetrag;
     private double zoomfaktor;
     private double cr;
     private double ci;
@@ -25,11 +28,7 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
     private double yMaximum;
     private int yChunk;
     private int xChunk;
-    private int client_threads;
-    int workersThreads;
-
-    int totalThread;
-    int indexstufenanzahl, indexstufenanzahlChunk;
+    private int master_threads;
     private int indexChunkY, rowsPerBlock;
     private int indexChunkX, columnPerBlock;
     private Thread[] threads;
@@ -37,8 +36,6 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
     private WorkerManager searchWorker() throws RemoteException{
         WorkerManager selected_worker_manager = null;
         for (WorkerManager wm : worker_manager_list) {
-            //System.out.println(this_worker_manager.worker + ", " + this_worker_manager.aufgabe);
-
             if (wm.aufgabe == 0) {
                 return wm;
             }
@@ -57,10 +54,6 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
 
     private void printActiveWorkers(){
         System.out.println("\nActive Worker: " + worker_manager_list.size());
-        
-        /* for (WorkerManager manager : worker_manager_list) {
-            System.out.println("ID: " + manager.worker_id);
-        } */
     }
 
     private void removeWorker(WorkerManager worker){
@@ -113,9 +106,8 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
                 indexstufenanzahl++;
                 getChunk();
             }
-            //else == end
         }else{
-            //forced to stop
+            System.out.println("F Stop: ");
             for (int restIndexstufenanzahlChunk = indexstufenanzahlChunk; restIndexstufenanzahlChunk < totalThread; restIndexstufenanzahlChunk++) {
                 threads[restIndexstufenanzahlChunk] = new Thread();
             }
@@ -146,7 +138,7 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
     Master() throws RemoteException {}
 
     @Override
-    public void setMandelbrotVariable(int xpix, int ypix, int stufenanzahl, int maxIterations, double add_iter, double maxBetrag, double zoomfaktor, double cr, double ci, double xMinimum, double xMaximum, double yMinimum, double yMaximum, int yChunk, int xChunk, int client_threads, int workersThreads){
+    public void setMandelbrotVariable(int xpix, int ypix, int stufenanzahl, int maxIterations, double add_iter, double maxBetrag, double zoomfaktor, double cr, double ci, double xMinimum, double xMaximum, double yMinimum, double yMaximum, int yChunk, int xChunk, int master_threads, int workersThreads){
         this.xpix = xpix;
         this.ypix = ypix;
         this.stufenanzahl = stufenanzahl;
@@ -162,7 +154,7 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
         this.yMaximum = yMaximum;
         this.yChunk = yChunk;
         this.xChunk = xChunk;
-        this.client_threads = client_threads;
+        this.master_threads = master_threads;
         this.workersThreads = workersThreads;
     }
 
@@ -181,7 +173,7 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
 
         threads = new Thread[totalThread];
 
-        for (int i = 0; i < client_threads; i++) {
+        for (int i = 0; i < master_threads; i++) {
             getChunk();
         }
 
@@ -210,9 +202,7 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
     }
 
     @Override
-    public void workerLogout(WorkerInterface worker){
-        //worker_manager_list.removeIf(manager -> manager.getWorker().equals(worker));
-        
+    public void workerLogout(WorkerInterface worker){        
         for (WorkerManager wm : worker_manager_list) {
             if (wm.getWorker().equals(worker)) {
                 removeWorker(wm);
