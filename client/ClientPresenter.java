@@ -1,25 +1,28 @@
 import java.io.FileInputStream;
 import java.util.Properties;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class ClientPresenter {
     protected ClientModel m;
     protected ClientView v;
     private Properties config_properties = new Properties();
-    int stufenanzahl;
-    double xMinimum, xMaximum, yMinimum, yMaximum;
-    double cr, ci;
-    double zoomfaktor;
+    BufferedImage buff_image;
     boolean restartVideo = false;
     boolean isEnd = false;
     boolean stopVideo = false;
     long startTime, currentTime, time_stamp;
-    Color[][][] mandel_result;
+    int input_replayDelay;
+    int stufenanzahl;
+    double xMinimum, xMaximum, yMinimum, yMaximum;
+    double cr, ci;
+    double zoomfaktor;
     int client_threads, workersThreads, maxIterations, yChunk, xChunk;
     int xpix, ypix;
     double maxBetrag, add_iter;
     float farbe_number;
-    int input_replayDelay;
+
+    Color[][][] bild;
 
     public void init(ClientModel m, ClientView v) {
         this.m = m;
@@ -56,9 +59,12 @@ public class ClientPresenter {
         stopVideo = false;
         v.replay_button_mandel.setVisible(false);
         v.stop_button_mandel.setVisible(true);
+        v.update_button_mandel.setVisible(false);
+        bild = new Color[stufenanzahl][xpix][ypix];
 
         new Thread(() -> {
-            mandel_result = m.mandelbrotImage(xMinimum, xMaximum, yMinimum, yMaximum);
+            startTime = System.currentTimeMillis();
+            m.startMandelbrot();
 
             if(restartVideo){
                 restartVideo = false;
@@ -80,8 +86,8 @@ public class ClientPresenter {
             v.update_button_mandel.setVisible(false);
             for (int i = 0; i < stufenanzahl; i++) {
                 if(!stopVideo){
-                    if(mandel_result[i][0][0] != null){
-                        v.updatePanel(mandel_result[i]);
+                    if(bild[i][0][0] != null){
+                        v.updatePanel(bild[i]);
                         try {
                             Thread.sleep(input_replayDelay);
                         } catch (InterruptedException e) {
@@ -96,5 +102,38 @@ public class ClientPresenter {
             v.update_button_mandel.setVisible(true);
             v.replay_button_mandel.setText("Replay");
         }).start();
+    }
+
+    void start_button_home(){
+        v.frame_home.setVisible(false);
+        xpix = Integer.parseInt(v.input_xpix.getText());
+        ypix = Integer.parseInt(v.input_ypix.getText());
+        v.updateInputData();
+
+        buff_image = new BufferedImage(xpix, ypix, BufferedImage.TYPE_INT_RGB);
+
+        v.initView();
+    }
+
+    void update_button_mandel(){
+        v.updateInputData();
+        stopVideo = true;
+        if(isEnd){
+            mandelbrotVideo();
+        }else{
+            restartVideo = true;
+        }
+    }
+
+    void replay_button_mandel(){
+        stopVideo = true;
+        if(isEnd){
+            replayVideo();
+        }
+    }
+
+    void stop_button_mandel(){
+        m.stopMandelbrot();
+        stopVideo = true;
     }
 }

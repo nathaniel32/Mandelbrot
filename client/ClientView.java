@@ -1,4 +1,4 @@
-import java.awt.image.BufferedImage;
+//import java.awt.image.BufferedImage;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -12,7 +12,7 @@ import java.awt.*;
 public class ClientView {
     private ClientPresenter p;
     private MandelbrotPanel mandelbrot_panel = new MandelbrotPanel();
-    private BufferedImage buff_image;
+    JFrame frame_home;
     int input_controlWidth = 0;
     JTextField input_xMinimum, input_yMinimum, input_yMaximum, input_xpix, input_ypix, input_add_iter, input_maxBetrag, input_farbe, input_cr, input_ci, input_zoom_rate, input_client_threads, input_maxIterations, input_chunk_y, input_chunk_x, input_stufenanzahl, input_workersThreads;
     private JLabel label_stufenanzahl = new JLabel("Stufenanzahl:");
@@ -41,7 +41,7 @@ public class ClientView {
     }
 
     public void setDim() {
-        JFrame frame_home = new JFrame("Mandelbrot-Setting");
+        frame_home = new JFrame("Mandelbrot-Setting");
         JPanel layout_home = new JPanel(new GridLayout(0, 2, 10, 5));
         layout_home.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JButton start_button_home = new JButton("Start");
@@ -130,14 +130,7 @@ public class ClientView {
         frame_home.setVisible(true);
 
         start_button_home.addActionListener(e -> {
-            frame_home.setVisible(false);
-            p.xpix = Integer.parseInt(input_xpix.getText());
-            p.ypix = Integer.parseInt(input_ypix.getText());
-            updateInputData();
-
-            buff_image = new BufferedImage(p.xpix, p.ypix, BufferedImage.TYPE_INT_RGB);
-
-            initView();
+            p.start_button_home();
         });
     }
 
@@ -149,7 +142,7 @@ public class ClientView {
         label_info.setText(text);
     }
 
-    private void initView() {
+    void initView() {
         JFrame frame_mandel = new JFrame("Mandelbrot");
         JPanel layout_mandel = new JPanel(new FlowLayout());
 
@@ -217,30 +210,21 @@ public class ClientView {
         frame_mandel.setVisible(true);
 
         update_button_mandel.addActionListener(e -> {
-            updateInputData();
-            p.stopVideo = true;
-            if(p.isEnd){
-                p.mandelbrotVideo();
-            }else{
-                p.restartVideo = true;
-            }
+            p.update_button_mandel();
         });
 
         replay_button_mandel.addActionListener(e -> {
-            p.stopVideo = true;
-            if(p.isEnd){
-                p.replayVideo();
-            }
+            p.replay_button_mandel();
         });
 
         stop_button_mandel.addActionListener(e -> {
-            p.stopVideo = true;
+            p.stop_button_mandel();
         });
 
         p.mandelbrotVideo();
     }
 
-    private void updateInputData(){
+    void updateInputData(){
         p.stufenanzahl = Integer.parseInt(input_stufenanzahl.getText());
         p.cr = Double.parseDouble(input_cr.getText());
         p.ci = Double.parseDouble(input_ci.getText());
@@ -264,7 +248,7 @@ public class ClientView {
     public void updatePanel(Color[][] c) {
         for (int y = 0; y < p.ypix; y++) {
             for (int x = 0; x < p.xpix; x++) {
-                if (c[x][y] != null) buff_image.setRGB(x, y, c[x][y].getRGB());
+                if (c[x][y] != null) p.buff_image.setRGB(x, y, c[x][y].getRGB());
             }
         }
         mandelbrot_panel.repaint();
@@ -274,7 +258,7 @@ public class ClientView {
         @Override
         public void paintComponent(Graphics graphics) {
             super.paintComponent(graphics);
-            graphics.drawImage(buff_image, 0, 0, null);
+            graphics.drawImage(p.buff_image, 0, 0, null);
         }
     }
 }

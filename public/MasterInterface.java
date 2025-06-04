@@ -2,8 +2,10 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface MasterInterface extends Remote {
-    String[] getSummary(int indexstufenanzahlChunk) throws RemoteException;
     String workerLogin(WorkerInterface worker) throws RemoteException;
     void workerLogout(WorkerInterface worker) throws RemoteException;
-    int[][] calculateMandelbrotImage(int workersThreads, int maxIterations, double maxBetrag, int yStart, int yStop, int xStart, int xStop, int xpix, int ypix, double xMinimum, double xMaximum, double yMinimum, double yMaximum) throws RemoteException;
+    void clientLogin(ClientInterface worker) throws RemoteException;
+    void setMandelbrotVariable(int xpix, int ypix, int stufenanzahl, int maxIterations, double add_iter, double maxBetrag, double zoomfaktor, double cr, double ci, double xMinimum, double xMaximum, double yMinimum, double yMaximum, int yChunk, int xChunk, int client_threads, int workersThreads) throws RemoteException;
+    void startMandelbrot() throws RemoteException;
+    void stopMandelbrot() throws RemoteException;
 }

@@ -1,6 +1,6 @@
-javac -d build public/NetworkConfig.java public/MasterInterface.java public/WorkerInterface.java master/Master.java
-javac -d build public/NetworkConfig.java public/MasterInterface.java public/WorkerInterface.java worker/Worker.java
-javac -d build public/NetworkConfig.java public/MasterInterface.java public/WorkerInterface.java client/*.java
+javac -d build public/NetworkConfig.java public/MasterInterface.java public/WorkerInterface.java public/ClientInterface.java master/*.java
+javac -d build public/NetworkConfig.java public/MasterInterface.java public/WorkerInterface.java public/ClientInterface.java worker/Worker.java
+javac -d build public/NetworkConfig.java public/MasterInterface.java public/WorkerInterface.java public/ClientInterface.java client/*.java
 
 start java -cp build Master --laddr localhost --mport 10000 --mserv MandelbrotServer
 
