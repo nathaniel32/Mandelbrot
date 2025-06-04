@@ -4,7 +4,7 @@ javac -d build public/NetworkConfig.java public/MasterInterface.java public/Work
 javac -d build public/NetworkConfig.java public/MasterInterface.java public/WorkerInterface.java public/ClientInterface.java worker/Worker.java
 javac -d build public/NetworkConfig.java public/MasterInterface.java public/WorkerInterface.java public/ClientInterface.java client/*.java
 
-java -cp build Master --laddr localhost --mport 10000 --mserv MandelbrotServer &
+java -cp build Master --mport 10000 --mserv MandelbrotServer --laddr localhost &
 
 sleep 1
 
@@ -13,4 +13,4 @@ java -cp build Worker --taddr localhost --mport 10000 --mserv MandelbrotServer -
 java -cp build Worker --taddr localhost --mport 10000 --mserv MandelbrotServer --laddr localhost &
 java -cp build Worker --taddr localhost --mport 10000 --mserv MandelbrotServer --laddr localhost &
 
-java -cp build Client --taddr localhost --mport 10000 --mserv MandelbrotServer &
+java -cp build Client --taddr localhost --mport 10000 --mserv MandelbrotServer --laddr localhost &

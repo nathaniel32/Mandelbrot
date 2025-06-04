@@ -4,11 +4,11 @@
 
 ```bash
 javac -d build public/NetworkConfig.java public/MasterInterface.java public/WorkerInterface.java public/ClientInterface.java master/*.java
-java -cp build Master --laddr localhost --mport 10000 --mserv MandelbrotServer
+java -cp build Master --mport 10000 --mserv MandelbrotServer --laddr localhost
 ```
 
 ```bash
-java -cp build Master --laddr <Master Address> --mport <Master Port> --mserv <Master Service>
+java -cp build Master --mport <Master Port> --mserv <Master Service> --laddr <Master Address>
 ```
 
 ## 2. Worker starten
@@ -26,9 +26,9 @@ java -cp build Worker --taddr <Master Address> --mport <Master Port> --mserv <Ma
 
 ```bash
 javac -d build public/NetworkConfig.java public/MasterInterface.java public/WorkerInterface.java public/ClientInterface.java client/*.java
-java -cp build Client --taddr localhost --mport 10000 --mserv MandelbrotServer
+java -cp build Client --taddr localhost --mport 10000 --mserv MandelbrotServer --laddr localhost
 ```
 
 ```bash
-java -cp build Client --taddr <Master Address> --mport <Master Port> --mserv <Master Service>
+java -cp build Client --taddr <Master Address> --mport <Master Port> --mserv <Master Service> --laddr <Master Address>
 ```

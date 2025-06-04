@@ -64,6 +64,7 @@ public class Client extends UnicastRemoteObject implements ClientInterface{
     public static void main(String[] args) {
         try {
             NetworkConfig rmiconfig = new NetworkConfig(args);
+            System.setProperty("java.rmi.server.hostname", rmiconfig.getLocalAddress());
             MasterInterface master = (MasterInterface) java.rmi.registry.LocateRegistry.getRegistry(rmiconfig.getTargetAddress(), rmiconfig.getMasterPort()).lookup(rmiconfig.getMasterService());
             Client client = new Client(master);
             master.clientLogin(client);
