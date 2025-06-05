@@ -46,7 +46,8 @@ public class ClientModel {
                 yMinimum = p.ci - ydim / 2 / p.zoomfaktor;
                 yMaximum = p.ci + ydim / 2 / p.zoomfaktor;
                 
-                p.v.updatePanel(bild[indexstufenanzahl]);
+                //p.v.updatePanel(bild[indexstufenanzahl]);
+                p.v.mandelbrot_panel.repaint();
                 
                 indexChunkY = 0;
                 indexstufenanzahl++;
@@ -154,6 +155,8 @@ public class ClientModel {
                                 float hue = 0.95f + 10f * smoothIter / worker_maxIterations * p.farbe_number;
                                 bild[worker_stufenanzahl][x][y] = Color.getHSBColor(hue % 1f, 0.6f, 1f);
                             }
+
+                            p.v.buff_image.setRGB(x, y, bild[worker_stufenanzahl][x][y].getRGB());
                             
                             resultX_index++;
                         }

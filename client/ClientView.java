@@ -11,8 +11,8 @@ import java.awt.*;
 
 public class ClientView {
     private ClientPresenter p;
-    private MandelbrotPanel mandelbrot_panel = new MandelbrotPanel();
-    private BufferedImage buff_image;
+    MandelbrotPanel mandelbrot_panel = new MandelbrotPanel();
+    BufferedImage buff_image;
     int input_controlWidth = 0;
     JTextField input_xMinimum, input_yMinimum, input_yMaximum, input_xpix, input_ypix, input_add_iter, input_maxBetrag, input_farbe, input_cr, input_ci, input_zoom_rate, input_client_threads, input_maxIterations, input_chunk_y, input_chunk_x, input_stufenanzahl, input_workersThreads;
     private JLabel label_stufenanzahl = new JLabel("Stufenanzahl:");
