@@ -131,7 +131,8 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
             NetworkConfig rmiconfig = new NetworkConfig(args);
 
             System.setProperty("java.rmi.server.hostname", rmiconfig.getLocalAddress());
-            Master master = new Master();
+            //Master master = new Master();
+            MasterInterface master = new Master();
             LocateRegistry.createRegistry(rmiconfig.getMasterPort());
 
             String masterUrl = "rmi://" + rmiconfig.getLocalAddress() + ":" + rmiconfig.getMasterPort() + "/" + rmiconfig.getMasterService();

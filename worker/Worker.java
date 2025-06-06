@@ -71,7 +71,8 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
             System.setProperty("java.rmi.server.hostname", rmiconfig.getLocalAddress());
 
             MasterInterface master = (MasterInterface) java.rmi.registry.LocateRegistry.getRegistry(rmiconfig.getTargetAddress(), rmiconfig.getMasterPort()).lookup(rmiconfig.getMasterService());
-            Worker worker = new Worker();
+            //Worker worker = new Worker();
+            WorkerInterface worker = new Worker();
 
             String worker_id = master.workerLogin(worker);
 
