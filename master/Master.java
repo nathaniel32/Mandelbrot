@@ -94,7 +94,7 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
 
     @Override
     public String[] getSummary(int totalChunks) {
-        List<WorkerManager> toRemove = new ArrayList<>();
+        //List<WorkerManager> toRemove = new ArrayList<>();
         String[] result = new String[worker_manager_list.size()];
         int i = 0;
         for (WorkerManager wm : worker_manager_list) {
@@ -103,14 +103,14 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
             wm.totalAufgabe = 0;
             i++;
 
-            if (wm.aufgabe != 0){
+            /* if (wm.aufgabe != 0){
                 toRemove.add(wm);
-            };
+            }; */
         }
-        for (WorkerManager wm : toRemove) {
+        /* for (WorkerManager wm : toRemove) {
             System.out.println("\n" + wm.worker_id + " is error!\nActive Task: " + wm.aufgabe);
             removeWorker(wm);
-        }
+        } */
         return result;
     }
 
