@@ -5,7 +5,7 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
     Worker() throws RemoteException {}
 
     @Override
-    synchronized public int[][] calculateMandelbrotImage_worker(int workersThreads, int maxIterations, double maxBetrag, int yStart, int yStop, int xStart, int xStop, int xpix, int ypix, double xMinimum, double xMaximum, double yMinimum, double yMaximum) throws RemoteException {        
+    synchronized public void calculateMandelbrotImage_worker(ClientInterface client, int workersThreads, int maxIterations, double maxBetrag, int yStart, int yStop, int xStart, int xStop, int xpix, int ypix, double xMinimum, double xMaximum, double yMinimum, double yMaximum, int totalTask, int indexStufenanzahl, int indexstufenanzahlChunk, int masterThread) throws RemoteException {        
         int total_y_length = yStop - yStart;
         int total_x_length = xStop - xStart;
 
@@ -48,7 +48,7 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
             }
         }
 
-        return colors;
+        client.setResultMandelbrot(colors, indexstufenanzahlChunk, totalTask, indexStufenanzahl, yStart, yStop, xStart, xStop, maxIterations, masterThread);
     }
 
     private int calculation(int maxIterations, double maxBetrag, double cr, double ci) {

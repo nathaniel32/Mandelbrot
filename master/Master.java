@@ -14,7 +14,7 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
     int ypix;
     double maxBetrag;
     int workersThreads;
-    int totalThread;
+    int totalTask;
     int indexstufenanzahl, indexstufenanzahlChunk;
     private int stufenanzahl;
     private int maxIterations;
@@ -67,7 +67,7 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
 
     synchronized void getChunk(){
         if(!stopVideo){
-            if(yChunk > indexChunkY && totalThread > indexstufenanzahlChunk){
+            if(yChunk > indexChunkY && totalTask > indexstufenanzahlChunk){
                 if(xChunk > indexChunkX){
                     int yStart = indexChunkY * rowsPerBlock;
                     int y_end = (indexChunkY == yChunk - 1) ? ypix : yStart + rowsPerBlock;
@@ -75,7 +75,7 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
                     int xStart = indexChunkX * columnPerBlock;
                     int x_end = (indexChunkX == xChunk - 1) ? xpix : xStart + columnPerBlock;
 
-                    threads[indexstufenanzahlChunk] = new Thread(new MandelbrotChunk(this, yStart, y_end, xStart, x_end, indexstufenanzahl, maxIterations, xMinimum, xMaximum, yMinimum, yMaximum));
+                    threads[indexstufenanzahlChunk] = new Thread(new MandelbrotChunk(this, yStart, y_end, xStart, x_end, indexstufenanzahl, maxIterations, xMinimum, xMaximum, yMinimum, yMaximum, indexstufenanzahlChunk));
                     threads[indexstufenanzahlChunk].start();
 
                     indexChunkX++;
@@ -109,7 +109,7 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
             }
         }else{
             System.out.println("F Stop: ");
-            for (int restIndexstufenanzahlChunk = indexstufenanzahlChunk; restIndexstufenanzahlChunk < totalThread; restIndexstufenanzahlChunk++) {
+            for (int restIndexstufenanzahlChunk = indexstufenanzahlChunk; restIndexstufenanzahlChunk < totalTask; restIndexstufenanzahlChunk++) {
                 threads[restIndexstufenanzahlChunk] = new Thread();
             }
         }
@@ -170,15 +170,15 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
         indexChunkX = 0;
         columnPerBlock = xpix / xChunk;
 
-        totalThread = xChunk * yChunk * stufenanzahl;
+        totalTask = xChunk * yChunk * stufenanzahl;
 
-        threads = new Thread[totalThread];
+        threads = new Thread[totalTask];
 
         for (int i = 0; i < master_threads; i++) {
             getChunk();
         }
 
-        for (int i = 0; i < totalThread; i++) {
+        for (int i = 0; i < totalTask; i++) {
             try {
                 threads[i].join();
             } catch (InterruptedException e) {
@@ -226,15 +226,14 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
         this.client = client;
     }
 
-    public int[][] calculateMandelbrotImage(int workersThreads, int maxIterations, double maxBetrag, int yStart, int yStop, int xStart, int xStop, int xpix, int ypix, double xMinimum, double xMaximum, double yMinimum, double yMaximum) throws RemoteException {
+    public void calculateMandelbrotImage(int maxIterations, int yStart, int yStop, int xStart, int xStop, double xMinimum, double xMaximum, double yMinimum, double yMaximum, int indexStufenanzahl, int indexstufenanzahlChunk) throws RemoteException {
         WorkerManager worker_manager;
         synchronized (this) {
             worker_manager = searchWorker();
             worker_manager.worker_arbeit_start();
         }
-        int[][] colors = worker_manager.worker.calculateMandelbrotImage_worker(workersThreads, maxIterations, maxBetrag, yStart, yStop, xStart, xStop, xpix, ypix, xMinimum, xMaximum, yMinimum, yMaximum);
+        worker_manager.worker.calculateMandelbrotImage_worker(client, workersThreads, maxIterations, maxBetrag, yStart, yStop, xStart, xStop, xpix, ypix, xMinimum, xMaximum, yMinimum, yMaximum, totalTask, indexStufenanzahl, indexstufenanzahlChunk, Thread.activeCount());
         worker_manager.worker_arbeit_end();
-        return colors;
     }
 
     public static void main(String[] args) {

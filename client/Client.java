@@ -12,12 +12,12 @@ public class Client extends UnicastRemoteObject implements ClientInterface{
     }
 
     @Override
-    public void setResultMandelbrot(int[][] result, int indexstufenanzahlChunk, int totalThread, int indexstufenanzahl, int worker_yStart, int worker_yStop, int worker_xStart, int worker_xStop, int worker_maxIterations, int worker_stufenanzahl, int master_thread){
+    public void setResultMandelbrot(int[][] result, int indexstufenanzahlChunk, int totalTask, int indexstufenanzahl, int worker_yStart, int worker_yStop, int worker_xStart, int worker_xStop, int worker_maxIterations, int master_thread){
         new Thread(() -> {
             p.currentTime = System.currentTimeMillis();
             p.time_stamp = p.currentTime - p.startTime;
             p.v.update_time(p.time_stamp);
-            p.v.showInfo("Chunks: " + indexstufenanzahlChunk + "/" + totalThread + " | Stufenanzahl: " + indexstufenanzahl + " | Max-Iterations: " + worker_maxIterations + " | Client-Threads: " + Thread.activeCount() + " | Master-Threads: " + master_thread);
+            p.v.showInfo("Chunks: " + indexstufenanzahlChunk + "/" + totalTask + " | Stufenanzahl: " + indexstufenanzahl + " | Max-Iterations: " + worker_maxIterations + " | Client-Threads: " + Thread.activeCount() + " | Master-Threads: " + master_thread);
 
             int resultY_index = 0;
             int resultX_index = 0;
@@ -26,16 +26,16 @@ public class Client extends UnicastRemoteObject implements ClientInterface{
                     int iter = result[resultX_index][resultY_index];
                     
                     if(iter == worker_maxIterations){
-                        p.bild[worker_stufenanzahl][x][y] = Color.BLACK;
+                        p.bild[indexstufenanzahl][x][y] = Color.BLACK;
                     }else{
                         double zn = Math.log(x * x + y * y) / 2;
                         double nu = Math.log(zn / Math.log(2)) / Math.log(2);
                         float smoothIter = (float)(iter + 1 - nu);
                         float hue = 0.95f + 10f * smoothIter / worker_maxIterations * p.farbe_number;
-                        p.bild[worker_stufenanzahl][x][y] = Color.getHSBColor(hue % 1f, 0.6f, 1f);
+                        p.bild[indexstufenanzahl][x][y] = Color.getHSBColor(hue % 1f, 0.6f, 1f);
                     }
 
-                    p.buff_image.setRGB(x, y, p.bild[worker_stufenanzahl][x][y].getRGB());
+                    p.buff_image.setRGB(x, y, p.bild[indexstufenanzahl][x][y].getRGB());
                     
                     resultX_index++;
                 }
