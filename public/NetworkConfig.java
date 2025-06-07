@@ -1,3 +1,4 @@
+import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -99,9 +100,16 @@ public class NetworkConfig {
 
     public String getLocalAddress() {
         if (localAddress == null) {
-            getHostIPv4Address();
-            System.out.print("Local IP/Hostname: ");
-            localAddress = scanner.nextLine().replace(" ", "");
+            try (final DatagramSocket socket = new DatagramSocket()) {
+                socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+                localAddress = socket.getLocalAddress().getHostAddress();
+                System.out.println("Hostname: " + localAddress);
+            } catch (Exception e) {
+                //e.printStackTrace();
+                getHostIPv4Address();
+                System.out.print("Local IP/Hostname: ");
+                localAddress = scanner.nextLine().replace(" ", "");
+            }
         }
         return localAddress;
     }
