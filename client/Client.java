@@ -46,7 +46,7 @@ public class Client extends UnicastRemoteObject implements ClientInterface{
     }
 
     @Override
-    public void drawMandelbrot(int indexstufenanzahl){
+    public void drawMandelbrot(){
         p.v.mandelbrot_panel.repaint();
     }
 

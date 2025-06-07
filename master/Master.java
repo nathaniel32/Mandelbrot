@@ -96,11 +96,10 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
                 
                 new Thread(() -> {
                     try {
-                        client.drawMandelbrot(indexstufenanzahl);
+                        client.drawMandelbrot();
                     } catch (RemoteException e) {
                         stopVideo = true;
-                        String message = "Client Error!";
-                        System.out.println(message);
+                        System.out.println("Client Error!");
                     }
                 }).start();
                 

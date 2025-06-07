@@ -24,13 +24,14 @@ public class MandelbrotChunk implements Runnable{
     public void run() {
         try {
             int[][] result = master.calculateMandelbrotImage(master.workersThreads, worker_maxIterations, master.maxBetrag, worker_yStart, worker_yStop,  worker_xStart, worker_xStop, master.xpix, master.ypix, worker_xMinimum, worker_xMaximum, worker_yMinimum, worker_yMaximum);
-            new Thread(() -> {
+            master.client.setResultMandelbrot(result, master.indexstufenanzahlChunk, master.totalThread, master.indexstufenanzahl, worker_yStart, worker_yStop, worker_xStart, worker_xStop, worker_maxIterations, worker_stufenanzahl, Thread.activeCount());
+            /* new Thread(() -> {
                 try {
                     master.client.setResultMandelbrot(result, master.indexstufenanzahlChunk, master.totalThread, master.indexstufenanzahl, worker_yStart, worker_yStop, worker_xStart, worker_xStop, worker_maxIterations, worker_stufenanzahl, Thread.activeCount());
                 } catch (RemoteException e) {
                     System.out.println("Client Error!");
                 }
-            }).start();
+            }).start(); */
         } catch (RemoteException e) {
             master.stopVideo = true;
             System.out.println("Worker Error!");
