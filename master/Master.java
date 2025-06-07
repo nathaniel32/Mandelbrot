@@ -190,8 +190,7 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
             client.endMandelbrot(getSummary(indexstufenanzahlChunk), indexstufenanzahlChunk);
         } catch (RemoteException e) {
             stopVideo = true;
-            String message = "Client Error!";
-            System.out.println(message);
+            System.out.println("Client Error!");
         }
 
         stopVideo = false;
