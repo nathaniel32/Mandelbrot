@@ -34,6 +34,8 @@ public class Client extends UnicastRemoteObject implements ClientInterface{
                         float hue = 0.95f + 10f * smoothIter / worker_maxIterations * p.farbe_number;
                         p.bild[worker_stufenanzahl][x][y] = Color.getHSBColor(hue % 1f, 0.6f, 1f);
                     }
+
+                    p.buff_image.setRGB(x, y, p.bild[worker_stufenanzahl][x][y].getRGB());
                     
                     resultX_index++;
                 }
@@ -45,9 +47,10 @@ public class Client extends UnicastRemoteObject implements ClientInterface{
 
     @Override
     public void drawMandelbrot(int indexstufenanzahl){
-        new Thread(() -> {
+        p.v.mandelbrot_panel.repaint();
+        /*  new Thread(() -> {
             p.v.updatePanel(p.bild[indexstufenanzahl]);
-        }).start();
+        }).start(); */
     }
 
     @Override
