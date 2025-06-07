@@ -48,9 +48,6 @@ public class Client extends UnicastRemoteObject implements ClientInterface{
     @Override
     public void drawMandelbrot(int indexstufenanzahl){
         p.v.mandelbrot_panel.repaint();
-        /*  new Thread(() -> {
-            p.v.updatePanel(p.bild[indexstufenanzahl]);
-        }).start(); */
     }
 
     @Override

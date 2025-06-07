@@ -94,13 +94,15 @@ public class Master extends UnicastRemoteObject implements MasterInterface {
                 yMinimum = ci - ydim / 2 / zoomfaktor;
                 yMaximum = ci + ydim / 2 / zoomfaktor;
                 
-                try {
-                    client.drawMandelbrot(indexstufenanzahl);
-                } catch (RemoteException e) {
-                    stopVideo = true;
-                    String message = "Client Error!";
-                    System.out.println(message);
-                }
+                new Thread(() -> {
+                    try {
+                        client.drawMandelbrot(indexstufenanzahl);
+                    } catch (RemoteException e) {
+                        stopVideo = true;
+                        String message = "Client Error!";
+                        System.out.println(message);
+                    }
+                }).start();
                 
                 indexChunkY = 0;
                 indexstufenanzahl++;
