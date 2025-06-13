@@ -63,10 +63,14 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
     //a_new = a^2 - b^2 + re
     //b_new = 2ab + im
 
+    //|Z| = root(a^2 + b^2)
+    //|Z| > 2 => Z is divergent
+    //|Z|^2 = a^2 + b^2
+
     private int calculation(int maxIterations, double maxBetrag, double cr, double ci) {
         int iter = 0;
         double zr = 0, zi = 0, zr2 = 0, zi2 = 0;
-        while (iter < maxIterations && (zr2 + zi2) <= maxBetrag) {
+        while (iter < maxIterations && (zr2 + zi2) <= maxBetrag) { //while konvergent
             zi = 2 * zr * zi + ci; //b_new = 2ab + im
             zr = zr2 - zi2 + cr; //a_new = a^2 - b^2 + re
             zr2 = zr * zr; //a^2
