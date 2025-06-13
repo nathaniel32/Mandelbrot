@@ -51,6 +51,18 @@ public class Worker extends UnicastRemoteObject implements WorkerInterface {
         return colors;
     }
 
+    //Z_n+1 = Zn^2 + c
+
+    //Zn = a + b * i
+    //=> Zn^2 = a^2 - b^2 + 2ab*i
+    //C = re + im * i
+
+    //Zn+1 = a^2 - b^2 + 2ab*i + re + im * i
+    //Zn+1 = a^2 - b^2 + re + (2ab + im) * i
+    //Zn+1 = a_n + b_n * i
+    //a_n+1 = a^2 - b^2 + re
+    //b_n+1 = 2ab + im
+
     private int calculation(int maxIterations, double maxBetrag, double cr, double ci) {
         int iter = 0;
         double zr = 0, zi = 0, zr2 = 0, zi2 = 0;
